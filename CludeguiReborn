@@ -193,14 +193,14 @@ e666.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 e666.Position = UDim2.new(0.388888896, 0, 0.43599999, 0)
 e666.Size = UDim2.new(0, 83, 0, 31)
 e666.Font = Enum.Font.GothamBold
-e666.Text = "Decal Spam"
+e666.Text = "k00pskidd Decal Spam"
 e666.TextColor3 = Color3.fromRGB(0, 0, 0)
 e666.TextScaled = true
 e666.TextSize = 14.000
 e666.TextWrapped = true
 e666.MouseButton1Down:connect(function()
 local msg = Instance.new("Message",workspace)
-		msg.Text = "Clude Is Destroying The Game!!!"
+		msg.Text = "k00pskidd Is Destroying The Game!!!"
 		wait(5.8)
 		msg:Destroy()
 		s = Instance.new("Sky")
@@ -322,62 +322,71 @@ ForceField.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 ForceField.Position = UDim2.new(0.693121672, 0, 0.648000002, 0)
 ForceField.Size = UDim2.new(0, 89, 0, 34)
 ForceField.Font = Enum.Font.GothamBold
-ForceField.Text = "FF"
+ForceField.Text = "Clude Decal Spam"
 ForceField.TextColor3 = Color3.fromRGB(0, 0, 0)
 ForceField.TextScaled = true
 ForceField.TextSize = 14.000
 ForceField.TextWrapped = true
 ForceField.MouseButton1Down:connect(function()
-	-- Gui to Lua
-	-- Version: 3.
-	-- Instances:
-
-	local ForceFieldGUI = Instance.new("ScreenGui")
-	local ForceFieldGUI_2 = Instance.new("TextButton")
-	local ForceFieldOFF = Instance.new("TextButton")
-	local ForceFieldON = Instance.new("TextButton")
-
-	--Properties:
-
-	ForceFieldGUI.Name = "ForceFieldGUI"
-	ForceFieldGUI.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
-	ForceFieldGUI_2.Name = "ForceFieldGUI"
-	ForceFieldGUI_2.Parent = ForceFieldGUI
-	ForceFieldGUI_2.BackgroundColor3 = Color3.fromRGB(0, 255, 255)
-	ForceFieldGUI_2.BackgroundTransparency = 0.300
-	ForceFieldGUI_2.BorderColor3 = Color3.fromRGB(245, 244, 247)
-	ForceFieldGUI_2.BorderSizePixel = 0
-	ForceFieldGUI_2.Position = UDim2.new(0, 0, 0, 240)
-	ForceFieldGUI_2.Size = UDim2.new(0, 100, 0, 20)
-	ForceFieldGUI_2.Text = "ForceField"
-	ForceFieldGUI_2.TextColor3 = Color3.fromRGB(17, 17, 17)
-	ForceFieldGUI_2.TextTransparency = 0.300
-
-	ForceFieldOFF.Name = "ForceFieldOFF"
-	ForceFieldOFF.Parent = ForceFieldGUI
-	ForceFieldOFF.BackgroundColor3 = Color3.fromRGB(253, 253, 253)
-	ForceFieldOFF.BackgroundTransparency = 0.300
-	ForceFieldOFF.BorderColor3 = Color3.fromRGB(245, 244, 247)
-	ForceFieldOFF.BorderSizePixel = 0
-	ForceFieldOFF.Position = UDim2.new(0, 0, 0, 280)
-	ForceFieldOFF.Size = UDim2.new(0, 100, 0, 20)
-	ForceFieldOFF.Visible = false
-	ForceFieldOFF.Text = "Off"
-	ForceFieldOFF.TextColor3 = Color3.fromRGB(17, 17, 17)
-
-	ForceFieldON.Name = "ForceFieldON"
-	ForceFieldON.Parent = ForceFieldGUI
-	ForceFieldON.BackgroundColor3 = Color3.fromRGB(253, 253, 253)
-	ForceFieldON.BackgroundTransparency = 0.300
-	ForceFieldON.BorderColor3 = Color3.fromRGB(245, 244, 247)
-	ForceFieldON.BorderSizePixel = 0
-	ForceFieldON.Position = UDim2.new(0, 0, 0, 260)
-	ForceFieldON.Size = UDim2.new(0, 100, 0, 20)
-	ForceFieldON.Visible = false
-	ForceFieldON.Text = "On"
-	ForceFieldON.TextColor3 = Color3.fromRGB(17, 17, 17)
-
+local msg = Instance.new("Message",workspace)
+		msg.Text = "Clude Is Destroying The Game!!!"
+		wait(5.8)
+		msg:Destroy()
+		s = Instance.new("Sky")
+		s.Name = "SKY"
+		s.SkyboxBk = "http://www.roblox.com/asset/?id=15138828714"
+		s.SkyboxDn = "http://www.roblox.com/asset/?id=15138828714"
+		s.SkyboxFt = "http://www.roblox.com/asset/?id=15138828714"
+		s.SkyboxLf = "http://www.roblox.com/asset/?id=15138828714"
+		s.SkyboxRt = "http://www.roblox.com/asset/?id=15138828714"
+		s.SkyboxUp = "http://www.roblox.com/asset/?id=15138828714"
+		s.Parent = game.Lighting
+		Spooky = Instance.new("Sound", game.Workspace)
+		Spooky.Name = "Spooky"
+		Spooky.SoundId = "rbxassetid://152745539"
+		Spooky.Volume = 20
+		Spooky.Looped = true
+		Spooky:Play()
+		local ID =15138828714 --id here
+		function spamDecal(v)
+			if v:IsA("Part") then
+				for i=0, 5 do
+					D = Instance.new("Decal")
+					D.Name = "K00PHACK"
+					D.Face = i
+					D.Parent = v
+					D.Texture = ("http://www.roblox.com/asset/?id="..Id)
+				end
+			else
+				if v:IsA("Model") then
+					for a,b in pairs(v:GetChildren()) do
+						spamDecal(b)
+					end
+				end
+			end
+		end
+		function decalspam(id) --use this function, not the one on top
+			Id = id
+			for i,v in pairs(game.Workspace:GetChildren()) do
+				if v:IsA("Part") then
+					for i=0, 5 do
+						D = Instance.new("Decal")
+						D.Name = "MYDECALHUE"
+						D.Face = i
+						D.Parent = v
+						D.Texture = ("http://www.roblox.com/asset/?id="..id)
+					end
+				else
+					if v:IsA("Model") then
+						for a,b in pairs(v:GetChildren()) do
+							spamDecal(b)
+						end
+					end
+				end
+			end
+		end
+	
+		decalspam(ID)
 	-- Scripts:
 
 	local function DVAWVL_fake_script() -- ForceFieldGUI_2.Script 
