@@ -114,23 +114,13 @@ e1x1x1x1Music.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 e1x1x1x1Music.Position = UDim2.new(0.0714285746, 0, 0.436000019, 0)
 e1x1x1x1Music.Size = UDim2.new(0, 79, 0, 31)
 e1x1x1x1Music.Font = Enum.Font.GothamBold
-e1x1x1x1Music.Text = "Clude Music"
+e1x1x1x1Music.Text = "BTools"
 e1x1x1x1Music.TextColor3 = Color3.fromRGB(0, 0, 0)
 e1x1x1x1Music.TextScaled = true
 e1x1x1x1Music.TextSize = 14.000
 e1x1x1x1Music.TextWrapped = true
 e1x1x1x1Music.MouseButton1Down:connect(function()
-s.Name = "Sound"
-		s.SoundId = "http://www.roblox.com/asset/?id=141415626111"
-		s.Volume = 100
-		s.Looped = true
-		s.archivable = false
-	
-		s.Parent = game.Workspace
-	
-		wait(3)
-	
-		s:play()
+Instance.new("HopperBin", game.Players.LocalPlayer.Backpack).BinType = 4
 end)
 e1x1x1x1Laugh.Name = "e1x1x1x1Laugh"
 e1x1x1x1Laugh.Parent = Frame
