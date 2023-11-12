@@ -1,4 +1,4 @@
--- Clude Hub Gui Hack
+-- Clude Gui Hack
 -- Gui to Lua
 -- Version: 3.
 -- Instances:
@@ -293,28 +293,22 @@ e2006Theme.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 e2006Theme.Position = UDim2.new(0.693121672, 0, 0.43599999, 0)
 e2006Theme.Size = UDim2.new(0, 89, 0, 31)
 e2006Theme.Font = Enum.Font.GothamBold
-e2006Theme.Text = "2006 Music"
+e2006Theme.Text = "illuminati particles"
 e2006Theme.TextColor3 = Color3.fromRGB(0, 0, 0)
 e2006Theme.TextScaled = true
 e2006Theme.TextSize = 14.000
 e2006Theme.TextWrapped = true
 e2006Theme.MouseButton1Down:connect(function()
-	--Made by Servano
 
-	local s = Instance.new("Sound")
-
-	s.Name = "Sound"
-	s.SoundId = "http://www.roblox.com/asset/?id=1987072964"
-	s.Volume = 1
-	s.Pitch = 1
-	s.Looped = true
-	s.archivable = false
-
-	s.Parent = game.Workspace
-
-	wait(1)
-
-	s:play()
+		local playerLeaderstats = {}
+		for i, v in pairs(game.Players:GetChildren()) do
+			table.insert(playerLeaderstats, v)
+		end
+		for i, v in pairs(playerLeaderstats) do
+			pe = Instance.new("ParticleEmitter",v.Character.Torso)
+			pe.Texture = "http://www.roblox.com/asset/?id=11744660552"
+			pe.VelocitySpread = 100
+		end
 end)
 ForceField.Name = "ForceField"
 ForceField.Parent = Frame
