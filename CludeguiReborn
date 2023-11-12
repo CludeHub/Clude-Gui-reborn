@@ -67,43 +67,43 @@ e1x1x1x1Message.MouseButton1Down:connect(function()
 		wait(12)--set this to how much time between messages
 		msg = Instance.new ("Hint")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: MUHAWHAWHAW! NOOBS! I HAVE RETURNED FOR MY REVENGE!"
+		msg.Text = "Clude: MUHAWHAWHAW! NOOBS! I HAVE RETURNED FOR MY REVENGE!"
 		wait(6)
 		msg:remove()
 		wait(3)
 		msg = Instance.new("Message")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: NOW YOU WILL ALL PARISH IN MY FIRE OF DOOM!"
+		msg.Text = "Clude: NOW YOU WILL ALL PARISH IN MY FIRE OF DOOM!"
 		wait(6)
 		msg:remove()
 		wait(3)
 		msg = Instance.new("Message")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: I WILL DESTROY YOU ALL! YOU ARE WORTHLESS!"
+		msg.Text = "Clude: I WILL DESTROY YOU ALL! YOU ARE WORTHLESS!"
 		wait(6)
 		msg:remove()
 		wait(3)
 		msg = Instance.new("Message")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: YOU WILL NOT LIVE THROUGH MY DEADLY ATTACKS!"
+		msg.Text = "Clude: YOU WILL NOT LIVE THROUGH MY DEADLY ATTACKS!"
 		wait(6)
 		msg:remove()
 		wait(3)
 		msg = Instance.new("Message")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: I MIGHT AS WELL CLONE YOU INTO BOTS!"
+		msg.Text = "Clude: I MIGHT AS WELL CLONE YOU INTO BOTS!"
 		wait(6)
 		msg:remove()
 		wait(3)
 		msg = Instance.new("Message")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: AND THEN THOSE BOTS WILL DESTROY ROBLOX! HAHAHAHAHA!"
+		msg.Text = "Clude: AND THEN THOSE BOTS WILL DESTROY ROBLOX! HAHAHAHAHA!"
 		wait(6)
 		msg:remove()
 		wait(3)
 		msg = Instance.new("Message")
 		msg.Parent = game.Workspace
-		msg.Text = "1x1x1x1: YOU CAN'T STOP ME! THERES NOTHING YOU CAN DO!"
+		msg.Text = "Clude: YOU CAN'T STOP ME! THERES NOTHING YOU CAN DO!"
 		wait(6)
 		msg:remove()
 	end
@@ -150,7 +150,7 @@ e1x1x1x1Laugh.MouseButton1Down:connect(function()
 
 	s.Name = "Sound"
 	s.SoundId = "http://www.roblox.com/asset/?id=35935204"
-	s.Volume = 1
+	s.Volume = 100
 	s.Pitch = 0.9
 	s.Looped = true
 	s.archivable = false
@@ -215,7 +215,7 @@ local msg = Instance.new("Message",workspace)
 		Spooky = Instance.new("Sound", game.Workspace)
 		Spooky.Name = "Spooky"
 		Spooky.SoundId = "rbxassetid://152745539"
-		Spooky.Volume = 20
+		Spooky.Volume = 100
 		Spooky.Looped = true
 		Spooky:Play()
 		local ID =11588317701 --id here
