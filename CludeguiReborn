@@ -71,37 +71,37 @@ e1x1x1x1Message.MouseButton1Down:connect(function()
 		wait(6)
 		msg:remove()
 		wait(3)
-		msg = Instance.new("Message")
+		msg = Instance.new("Hint")
 		msg.Parent = game.Workspace
 		msg.Text = "Clude: NOW YOU WILL ALL PARISH IN MY FIRE OF DOOM!"
 		wait(6)
 		msg:remove()
 		wait(3)
-		msg = Instance.new("Message")
+		msg = Instance.new("Hint")
 		msg.Parent = game.Workspace
 		msg.Text = "Clude: I WILL DESTROY YOU ALL! YOU ARE WORTHLESS!"
 		wait(6)
 		msg:remove()
 		wait(3)
-		msg = Instance.new("Message")
+		msg = Instance.new("Hint")
 		msg.Parent = game.Workspace
 		msg.Text = "Clude: YOU WILL NOT LIVE THROUGH MY DEADLY ATTACKS!"
 		wait(6)
 		msg:remove()
 		wait(3)
-		msg = Instance.new("Message")
+		msg = Instance.new("Hint")
 		msg.Parent = game.Workspace
 		msg.Text = "Clude: I MIGHT AS WELL CLONE YOU INTO BOTS!"
 		wait(6)
 		msg:remove()
 		wait(3)
-		msg = Instance.new("Message")
+		msg = Instance.new("Hint")
 		msg.Parent = game.Workspace
 		msg.Text = "Clude: AND THEN THOSE BOTS WILL DESTROY ROBLOX! HAHAHAHAHA!"
 		wait(6)
 		msg:remove()
 		wait(3)
-		msg = Instance.new("Message")
+		msg = Instance.new("Hint")
 		msg.Parent = game.Workspace
 		msg.Text = "Clude: YOU CAN'T STOP ME! THERES NOTHING YOU CAN DO!"
 		wait(6)
@@ -114,13 +114,13 @@ e1x1x1x1Music.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 e1x1x1x1Music.Position = UDim2.new(0.0714285746, 0, 0.436000019, 0)
 e1x1x1x1Music.Size = UDim2.new(0, 79, 0, 31)
 e1x1x1x1Music.Font = Enum.Font.GothamBold
-e1x1x1x1Music.Text = "BTools"
+e1x1x1x1Music.Text = "John Doe"
 e1x1x1x1Music.TextColor3 = Color3.fromRGB(0, 0, 0)
 e1x1x1x1Music.TextScaled = true
 e1x1x1x1Music.TextSize = 14.000
 e1x1x1x1Music.TextWrapped = true
 e1x1x1x1Music.MouseButton1Down:connect(function()
-Instance.new("HopperBin", game.Players.LocalPlayer.Backpack).BinType = 4
+loadstring(game:HttpGet('https://pastebin.com/raw/QD4hQpRJ'))()
 end)
 e1x1x1x1Laugh.Name = "e1x1x1x1Laugh"
 e1x1x1x1Laugh.Parent = Frame
@@ -269,13 +269,13 @@ Disc0.BackgroundColor3 = Color3.fromRGB(0, 0, 255)
 Disc0.Position = UDim2.new(0.693121672, 0, 0.216000006, 0)
 Disc0.Size = UDim2.new(0, 89, 0, 31)
 Disc0.Font = Enum.Font.GothamBold
-Disc0.Text = "Clude Gui"
+Disc0.Text = "lost scythe"
 Disc0.TextColor3 = Color3.fromRGB(0, 0, 0)
 Disc0.TextScaled = true
 Disc0.TextSize = 14.000
 Disc0.TextWrapped = true
 Disc0.MouseButton1Down:connect(function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeHub/Clude-Gui-Hack-/main/CludeGui"))()
+loadstring(game:HttpGet('https://pastebin.com/raw/e5qZM9ns'))()
 end)
 e2006Theme.Name = "e2006Theme"
 e2006Theme.Parent = Frame
