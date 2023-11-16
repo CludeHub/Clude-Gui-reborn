@@ -18,7 +18,7 @@ local Disc0 = Instance.new("TextButton")
 local e2006Theme = Instance.new("TextButton")
 local ForceField = Instance.new("TextButton")
 
---Properties:
+-- Properties:
 
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
