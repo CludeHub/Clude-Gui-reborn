@@ -1,3 +1,11 @@
+-- Subscribe to clude80
+
+game:GetService("StarterGui"):SetCore("SendNotification", { 
+        Title = "Clude";
+        Text = "Thanks For Using My Script1!1";
+        Icon = "rbxthumb://type=Asset&id=15428498888&w=150&h=150"})
+    Duration = 20;
+
 local cka = Instance.new("ScreenGui")
 local frame = Instance.new("Frame")
 local titler = Instance.new("TextLabel")
