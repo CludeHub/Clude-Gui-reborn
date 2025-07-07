@@ -1,0 +1,1260 @@
+game.Players.LocalPlayer.PlayerGui.Teleport_UI.Frame.Gear.Visible = true 
+game.Players.LocalPlayer.PlayerGui.Teleport_UI.Frame.Pets.Visible = true 
+
+local NEVERLOSE = loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeHub/SourceCludeLib/refs/heads/main/NerverLoseLibEdited.lua"))()
+
+local TextHub = "CludeHub"
+local Text = "GROW A GARDEN"
+
+		print("Applying Dark Theme...")
+local Window = NEVERLOSE:AddWindow(TextHub,Text,'original')
+Window:AddTabLabel('Home')
+
+local H = Window:AddTab('Home','home')
+
+Window:AddTabLabel('Main')
+
+local I = Window:AddTab('Teleports','ads')
+local S = Window:AddTab('Shop','shop')
+local F = Window:AddTab('Farm','farm')
+local E = Window:AddTab('Event','shop')
+local P = Window:AddTab('Player','user')
+local Cos = Window:AddTab('Cosmetics','cosmetics')
+local egg = Window:AddTab('Pet Eggs','egg')
+local G = Window:AddTab('Config','gear')
+local glsl = G:AddSection('Shader',"left")
+
+local pet = egg:AddSection('Auto Buy',"left")
+
+local h = H:AddSection('Credit',"left")
+local oh = H:AddSection('Other',"right")
+
+local i = I:AddSection('Shop',"left")
+local gl = I:AddSection('Gardens',"right")
+
+local se = S:AddSection('Sell',"left")
+
+local s = S:AddSection('Seeds',"left")
+local g = S:AddSection('Gear',"right")
+
+local e = E:AddSection('Blood Moon Shop',"left")
+local t = E:AddSection('Twilight Shop',"right")
+local ev = E:AddSection('Bee Shop',"left")
+local sum = E:AddSection('Summer Event',"right")
+
+local p = P:AddSection('Power',"left")
+local an = P:AddSection('Anti',"right")
+local admin = P:AddSection('Admin Section',"right")
+
+local as = F:AddSection('Auto Plant',"left")
+local af = F:AddSection('Auto Fruit',"right")
+local o = F:AddSection('Other',"right")
+
+glsl:AddButton("Dupe", function()
+-- Get the player and character
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+-- Find the tool currently held
+local tool = character:FindFirstChildOfClass("Tool")
+if not tool or not tool:FindFirstChild("Handle") then
+    warn("No tool found or tool has no handle.")
+    return
+end
+
+-- Clone the tool
+local clonedTool = tool:Clone()
+local clonedHandle = clonedTool:FindFirstChild("Handle")
+
+-- Keep the names exactly as the original
+clonedTool.Name = tool.Name
+if clonedHandle then
+    clonedHandle.Name = tool.Handle.Name
+end
+
+-- Put the cloned tool into your Backpack
+clonedTool.Parent = player.Backpack
+print("Cloned tool and handle created with the original names.")
+end)
+
+
+local eggIDs = {
+    ["Pet Egg 1"] = 1,
+    ["Pet Egg 2"] = 2,
+    ["Pet Egg 3"] = 3
+}
+
+for eggName, eggId in pairs(eggIDs) do
+    pet:AddToggle(eggName, false, function(val)
+        if val then
+            local args = {eggId}
+            game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuyPetEgg"):FireServer(unpack(args))
+            print(eggName .. " purchased")
+        end
+    end)
+end
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local connection
+
+sum:AddToggle('Auto Submit Fruit', false, function(val)
+    if val then
+        -- Connect the RenderStepped handler
+        connection = RunService.RenderStepped:Connect(function()
+            local tool = player.Character and player.Character:FindFirstChildOfClass("Tool")
+            if tool and string.find(tool.Name:lower(), "kg") then
+                ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("SummerHarvestRemoteEvent"):FireServer("SubmitHeldPlant")
+            end
+        end)
+    else
+        -- Disconnect the handler if it exists
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+    end
+
+    print("Auto Submit Fruit:", val and "Enabled" or "Disabled")
+end)
+
+local names = {
+    "Avocado",
+    "Cauliflower",
+    "Green Apple",
+    "Banana",
+    "Pineapple",
+    "Kiwi",
+    "Bell Pepper",
+    "Prickly Pear",
+    "Loquat",
+    "Feijoa"
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(unpack(names))
+
+for _, seedName in ipairs(names) do
+    sum:AddToggle(seedName, false, function(val)
+        print("Toggle for " .. seedName .. " is now:", val)
+    end)
+end
+
+speeds = 2
+
+local speaker = game:GetService("Players").LocalPlayer
+
+local chr = game.Players.LocalPlayer.Character
+local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+
+nowe = false
+
+admin:AddToggle('Fly',false,function(val)
+if nowe == true then
+		nowe = false
+
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,true)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,true)
+		speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.RunningNoPhysics)
+	else 
+		nowe = true
+
+
+
+		for i = 1, speeds do
+			spawn(function()
+
+				local hb = game:GetService("RunService").Heartbeat	
+
+
+				tpwalking = true
+				local chr = game.Players.LocalPlayer.Character
+				local hum = chr and chr:FindFirstChildWhichIsA("Humanoid")
+				while tpwalking and hb:Wait() and chr and hum and hum.Parent do
+					if hum.MoveDirection.Magnitude > 0 then
+						chr:TranslateBy(hum.MoveDirection)
+					end
+				end
+
+			end)
+		end
+		game.Players.LocalPlayer.Character.Animate.Disabled = true
+		local Char = game.Players.LocalPlayer.Character
+		local Hum = Char:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
+
+		for i,v in next, Hum:GetPlayingAnimationTracks() do
+			v:AdjustSpeed(0)
+		end
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.FallingDown,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Flying,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Freefall,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.GettingUp,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Jumping,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Landed,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Physics,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.PlatformStanding,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Ragdoll,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Running,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.RunningNoPhysics,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.StrafingNoPhysics,false)
+		speaker.Character.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Swimming,false)
+		speaker.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Swimming)
+	end
+
+
+
+
+	if game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R6 then
+
+
+
+		local plr = game.Players.LocalPlayer
+		local torso = plr.Character.Torso
+		local flying = true
+		local deb = true
+		local ctrl = {f = 0, b = 0, l = 0, r = 0}
+		local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+		local maxspeed = 50
+		local speed = 0
+
+
+		local bg = Instance.new("BodyGyro", torso)
+		bg.P = 9e4
+		bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+		bg.cframe = torso.CFrame
+		local bv = Instance.new("BodyVelocity", torso)
+		bv.velocity = Vector3.new(0,0.1,0)
+		bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+		if nowe == true then
+			plr.Character.Humanoid.PlatformStand = true
+		end
+		while nowe == true or game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0 do
+			game:GetService("RunService").RenderStepped:Wait()
+
+			if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+				speed = speed+.5+(speed/maxspeed)
+				if speed > maxspeed then
+					speed = maxspeed
+				end
+			elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+				speed = speed-1
+				if speed < 0 then
+					speed = 0
+				end
+			end
+			if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+				bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+				lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+			elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+				bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+			else
+				bv.velocity = Vector3.new(0,0,0)
+			end
+			--	game.Players.LocalPlayer.Character.Animate.Disabled = true
+			bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
+		end
+		ctrl = {f = 0, b = 0, l = 0, r = 0}
+		lastctrl = {f = 0, b = 0, l = 0, r = 0}
+		speed = 0
+		bg:Destroy()
+		bv:Destroy()
+		plr.Character.Humanoid.PlatformStand = false
+		game.Players.LocalPlayer.Character.Animate.Disabled = false
+		tpwalking = false
+
+
+
+
+	else
+		local plr = game.Players.LocalPlayer
+		local UpperTorso = plr.Character.UpperTorso
+		local flying = true
+		local deb = true
+		local ctrl = {f = 0, b = 0, l = 0, r = 0}
+		local lastctrl = {f = 0, b = 0, l = 0, r = 0}
+		local maxspeed = 50
+		local speed = 0
+
+
+		local bg = Instance.new("BodyGyro", UpperTorso)
+		bg.P = 9e4
+		bg.maxTorque = Vector3.new(9e9, 9e9, 9e9)
+		bg.cframe = UpperTorso.CFrame
+		local bv = Instance.new("BodyVelocity", UpperTorso)
+		bv.velocity = Vector3.new(0,0.1,0)
+		bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
+		if nowe == true then
+			plr.Character.Humanoid.PlatformStand = true
+		end
+		while nowe == true or game:GetService("Players").LocalPlayer.Character.Humanoid.Health == 0 do
+			wait()
+
+			if ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0 then
+				speed = speed+.5+(speed/maxspeed)
+				if speed > maxspeed then
+					speed = maxspeed
+				end
+			elseif not (ctrl.l + ctrl.r ~= 0 or ctrl.f + ctrl.b ~= 0) and speed ~= 0 then
+				speed = speed-1
+				if speed < 0 then
+					speed = 0
+				end
+			end
+			if (ctrl.l + ctrl.r) ~= 0 or (ctrl.f + ctrl.b) ~= 0 then
+				bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (ctrl.f+ctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(ctrl.l+ctrl.r,(ctrl.f+ctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+				lastctrl = {f = ctrl.f, b = ctrl.b, l = ctrl.l, r = ctrl.r}
+			elseif (ctrl.l + ctrl.r) == 0 and (ctrl.f + ctrl.b) == 0 and speed ~= 0 then
+				bv.velocity = ((game.Workspace.CurrentCamera.CoordinateFrame.lookVector * (lastctrl.f+lastctrl.b)) + ((game.Workspace.CurrentCamera.CoordinateFrame * CFrame.new(lastctrl.l+lastctrl.r,(lastctrl.f+lastctrl.b)*.2,0).p) - game.Workspace.CurrentCamera.CoordinateFrame.p))*speed
+			else
+				bv.velocity = Vector3.new(0,0,0)
+			end
+
+			bg.cframe = game.Workspace.CurrentCamera.CoordinateFrame * CFrame.Angles(-math.rad((ctrl.f+ctrl.b)*50*speed/maxspeed),0,0)
+		end
+		ctrl = {f = 0, b = 0, l = 0, r = 0}
+		lastctrl = {f = 0, b = 0, l = 0, r = 0}
+		speed = 0
+		bg:Destroy()
+		bv:Destroy()
+		plr.Character.Humanoid.PlatformStand = false
+		game.Players.LocalPlayer.Character.Animate.Disabled = false
+		tpwalking = false
+
+
+
+	end
+    print("Toggle",val)
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local noclipConnection
+local espEnabled = false
+local espObjects = {}
+
+-- Noclip Toggle
+admin:AddToggle('Noclip', false, function(val)
+    if val then
+        noclipConnection = RunService.Stepped:Connect(function()
+            if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+        -- restore collision
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    end
+end)
+
+-- ESP Functions
+local function createESP(player)
+    if player == LocalPlayer then return end
+    local character = player.Character
+    if not character then return end
+
+    local box = Instance.new("BoxHandleAdornment")
+    box.Adornee = character:FindFirstChild("HumanoidRootPart")
+    box.AlwaysOnTop = true
+    box.ZIndex = 5
+    box.Size = Vector3.new(4, 6, 2)
+    box.Color3 = Color3.new(0, 1, 0)
+    box.Transparency = 0.3
+    box.Parent = character
+
+    local line = Drawing.new("Line")
+    line.Color = Color3.new(0, 1, 0)
+    line.Thickness = 1
+
+    espObjects[player] = {Box = box, Line = line}
+end
+
+local function removeESP(player)
+    if espObjects[player] then
+        espObjects[player].Box:Destroy()
+        espObjects[player].Line:Remove()
+        espObjects[player] = nil
+    end
+end
+
+-- Update ESP positions
+local function updateESP()
+    for player, objects in pairs(espObjects) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local pos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+            if onScreen then
+                objects.Line.From = Vector2.new(workspace.CurrentCamera.ViewportSize.X / 2, workspace.CurrentCamera.ViewportSize.Y)
+                objects.Line.To = Vector2.new(pos.X, pos.Y)
+                objects.Line.Visible = true
+            else
+                objects.Line.Visible = false
+            end
+        else
+            objects.Line.Visible = false
+        end
+    end
+end
+
+-- ESP Toggle
+admin:AddToggle('ESP', false, function(val)
+    espEnabled = val
+    if val then
+        -- Create ESP for all players
+        for _, player in ipairs(Players:GetPlayers()) do
+            createESP(player)
+        end
+
+        -- Listen for new players
+        Players.PlayerAdded:Connect(function(player)
+            player.CharacterAdded:Connect(function()
+                wait(1)
+                createESP(player)
+            end)
+        end)
+
+        RunService.RenderStepped:Connect(updateESP)
+    else
+        -- Remove ESP for all players
+        for player, _ in pairs(espObjects) do
+            removeESP(player)
+        end
+    end
+end)
+
+
+local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuyCosmeticItem")
+
+local cosmetics = Cos:AddSection('Option 1', "left")
+local cosmetics2 = Cos:AddSection('Option 2', "right")
+
+local cosmeticsList = {
+    "Statue Crate","Classic Gnome Crate","Fun Crate","Farmer Gnome Crate",
+    "Red Tractor","Green Tractor","Blue Well","Brown Well","Red Well",
+    "Frog Fountain","Ring Walkway","Viney Ring Walkway",
+    "Round Metal Arbour","Large Wood Arbour","Common Gnome Crate",
+    "Sign Crate","Flat Canopy","Curved Canopy","Small Wood Arbour",
+    "Square Metal Arbour","Lamp Post","Bird Bath","Large Wood Table",
+    "Small Wood Table","Clothesline","Wheelbarrow","Metal Wind Chime",
+    "Brown Stone Pillar","Bamboo Wind Chime","Grey Stone Pillar",
+    "Dark Stone Pillar","Cooking Pot","Campfire","White Bench",
+    "Log Bench","Wood Fence","Brown Bench","Small Stone Pad",
+    "Large Stone Pad","Medium Stone Table","Stone Lantern",
+    "Small Stone Lantern","Small Stone Table","Long Stone Table",
+    "Bookshelf","Hay Bale","Small Wood Flooring","Mini TV",
+    "Medium Wood Flooring","Large Wood Flooring","Viney Beam",
+    "Water Trough","Light on Ground","Shovel Grave","Small Path Tile",
+    "Medium Path Tile","Large Path Tile","Log","Small Circle Tile",
+    "Medium Circle Tile","Yellow Umbrella","Orange Umbrella","Red Pottery",
+    "White Pottery","Shovel","Brick Stack","Rake","Torch","Rock Pile",
+    "Compost Bin"
+}
+
+local half = math.ceil(#cosmeticsList / 2)
+
+for i, name in ipairs(cosmeticsList) do
+    local section = i <= half and cosmetics or cosmetics2
+    section:AddToggle("Auto Buy " .. name, false, function(val)
+        if val then
+            task.spawn(function()
+                while val do
+                    event:FireServer(name)
+                    task.wait(0.5)
+                end
+            end)
+        end
+    end)
+end
+
+glsl:AddButton('RTX Night', function()
+-- Set graphics settings to manual level 21
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level21
+
+-- Modify all ParticleEmitters in the game to have a rate of 6+ and realistic brightness
+for _, particle in ipairs(workspace:GetDescendants()) do
+    if particle:IsA("ParticleEmitter") then
+        -- Set particle rate to at least 6
+        particle.Rate = math.max(particle.Rate, 6)
+        
+        -- Set realistic lighting (brightness)
+        particle.LightEmission = 0.6  -- More balanced, not too bright or dim
+        particle.LightInfluence = 0.3 -- Allow world lighting to influence particles
+    end
+end
+
+local camera = workspace.CurrentCamera
+local blurAmount = 10
+local blurAmplifier = 5
+local lastVector = camera.CFrame.LookVector
+
+local motionBlur = Instance.new("BlurEffect", camera)
+
+local runService = game:GetService("RunService")
+
+workspace.Changed:Connect(function(property)
+ if property == "CurrentCamera" then
+  print("Changed")
+  local camera = workspace.CurrentCamera
+  if motionBlur and motionBlur.Parent then
+   motionBlur.Parent = camera
+  else
+   motionBlur = Instance.new("BlurEffect", camera)
+  end
+ end
+end)
+
+runService.Heartbeat:Connect(function()
+ if not motionBlur or motionBlur.Parent == nil then
+  motionBlur = Instance.new("BlurEffect", camera)
+ end
+ 
+ local magnitude = (camera.CFrame.LookVector - lastVector).magnitude
+ motionBlur.Size = math.abs(magnitude)*blurAmount*blurAmplifier/2
+ lastVector = camera.CFrame.LookVector
+end)
+
+local Lighting = game:GetService("Lighting")
+
+-- Apply lighting settings (no fog)
+Lighting.ClockTime = 6
+Lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+Lighting.GlobalShadows = true
+Lighting.EnvironmentSpecularScale = 0.255
+Lighting.Technology = Enum.Technology.Future
+Lighting.GeographicLatitude = -15.12
+Lighting.Ambient = Color3.new(0.007843137718737125, 0.007843137718737125, 0.007843137718737125)
+Lighting.OutdoorAmbient = Color3.new(0.2, 0.21176470816135406, 0.26274511218070984)
+Lighting.ExposureCompensation = 0.85
+Lighting.Brightness = 3.25
+Lighting.ColorShift_Top = Color3.new(1, 0.9686274528503418, 0.929411768913269)
+Lighting.EnvironmentDiffuseScale = 0.203
+
+-- Clear any existing fog settings
+Lighting.FogStart = 1e10
+Lighting.FogEnd = 1e10
+Lighting.FogColor = Color3.new(1, 1, 1)
+
+-- Create dummy IntValues
+local names = {
+    "P9TC2", "vA5C3", "DR9ww", "0nurp", "R94w0", "cr0VR", "3ow3N", "s0Gz6", "54hV8", "xB5jv",
+    "E7FH3", "a6tIU", "78s6s", "q4f1X", "L8ely", "5Jdzo", "L1M60", "j2Csd", "HY59A", "OirQj",
+    "ud7wD", "65fuz", "3x2n3", "EJ8Na", "hljqE", "2OXMt", "Nc4J9", "OdRmQ", "KvHse", "ypOq6",
+    "Dj55d", "Y81g4", "MU2UJ", "q3H32", "lAF00"
+}
+
+for _, name in ipairs(names) do
+    local intValue = Instance.new("IntValue")
+    intValue.Name = name
+    intValue.Parent = Lighting
+end
+
+-- Create visual effects
+local function createEffect(class)
+    local e = Instance.new(class)
+    e.Name = "M8roY"
+    e.Parent = Lighting
+    return e
+end
+
+local cce = createEffect("ColorCorrectionEffect")
+cce.Brightness = 0.1
+
+createEffect("Atmosphere")
+createEffect("BloomEffect")
+createEffect("DepthOfFieldEffect")
+createEffect("Sky")
+createEffect("SunRaysEffect")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Char = workspace:WaitForChild(LocalPlayer.Name)
+local Humanoid = Char:WaitForChild("Humanoid")
+local Camera = workspace.CurrentCamera
+
+local Turn = 0
+
+local function Lerp(a, b, t)
+    return a + (b - a) * t
+end
+
+RunService.RenderStepped:Connect(function()
+    if Camera.CameraType ~= Enum.CameraType.Custom then return end
+
+    local head = Char:FindFirstChild("Head")
+    if not head then return end
+
+    -- Check if player is in first person (camera is very close to the head)
+    local isFirstPerson = (Camera.CFrame.Position - head.Position).Magnitude < 1
+
+    if not isFirstPerson then
+        Humanoid.CameraOffset = Vector3.zero
+        return
+    end
+
+    local CT = tick()
+
+    -- Camera bobbing when walking  
+    if Humanoid.MoveDirection.Magnitude > 0 then  
+        local BobbleX = math.cos(CT * 5) * 0.25  
+        local BobbleY = math.abs(math.sin(CT * 5)) * 0.25  
+        local Bobble = Vector3.new(BobbleX, BobbleY, 0)  
+        Humanoid.CameraOffset = Humanoid.CameraOffset:Lerp(Bobble, 0.25)  
+    else  
+        Humanoid.CameraOffset = Humanoid.CameraOffset * 0.75  
+    end  
+
+    -- Camera sway with mouse movement  
+    local MouseDelta = UserInputService:GetMouseDelta()  
+    Turn = Lerp(Turn, math.clamp(MouseDelta.X, -6, 6), 6 * RunService.RenderStepped:Wait())  
+    Camera.CFrame = Camera.CFrame * CFrame.Angles(0, 0, math.rad(Turn))
+end)
+end)
+
+glsl:AddButton('RTX Day', function()
+-- Set graphics settings to manual level 21
+settings().Rendering.QualityLevel = Enum.QualityLevel.Level21
+
+-- Modify all ParticleEmitters in the game to have a rate of 6+ and realistic brightness
+for _, particle in ipairs(workspace:GetDescendants()) do
+    if particle:IsA("ParticleEmitter") then
+        particle.Rate = math.max(particle.Rate, 6)
+        particle.LightEmission = 0.6
+        particle.LightInfluence = 0.3
+    end
+end
+
+local camera = workspace.CurrentCamera
+local blurAmount = 10
+local blurAmplifier = 5
+local lastVector = camera.CFrame.LookVector
+
+local motionBlur = Instance.new("BlurEffect", camera)
+
+local runService = game:GetService("RunService")
+
+workspace.Changed:Connect(function(property)
+    if property == "CurrentCamera" then
+        local camera = workspace.CurrentCamera
+        if motionBlur and motionBlur.Parent then
+            motionBlur.Parent = camera
+        else
+            motionBlur = Instance.new("BlurEffect", camera)
+        end
+    end
+end)
+
+runService.Heartbeat:Connect(function()
+    if not motionBlur or motionBlur.Parent == nil then
+        motionBlur = Instance.new("BlurEffect", camera)
+    end
+
+    local magnitude = (camera.CFrame.LookVector - lastVector).magnitude
+    motionBlur.Size = math.abs(magnitude)*blurAmount*blurAmplifier/2
+    lastVector = camera.CFrame.LookVector
+end)
+
+local Lighting = game:GetService("Lighting")
+
+-- Apply lighting settings (no fog) with daytime
+Lighting.ClockTime = 12
+Lighting.ColorShift_Bottom = Color3.new(0, 0, 0)
+Lighting.GlobalShadows = true
+Lighting.EnvironmentSpecularScale = 0.255
+Lighting.Technology = Enum.Technology.Future
+Lighting.GeographicLatitude = -15.12
+Lighting.Ambient = Color3.new(0.007843137718737125, 0.007843137718737125, 0.007843137718737125)
+Lighting.OutdoorAmbient = Color3.new(0.2, 0.21176470816135406, 0.26274511218070984)
+Lighting.ExposureCompensation = 0.85
+Lighting.Brightness = 3.25
+Lighting.ColorShift_Top = Color3.new(1, 0.9686274528503418, 0.929411768913269)
+Lighting.EnvironmentDiffuseScale = 0.203
+Lighting.FogStart = 1e10
+Lighting.FogEnd = 1e10
+Lighting.FogColor = Color3.new(1, 1, 1)
+
+-- Create dummy IntValues
+local names = {
+    "P9TC2", "vA5C3", "DR9ww", "0nurp", "R94w0", "cr0VR", "3ow3N", "s0Gz6", "54hV8", "xB5jv",
+    "E7FH3", "a6tIU", "78s6s", "q4f1X", "L8ely", "5Jdzo", "L1M60", "j2Csd", "HY59A", "OirQj",
+    "ud7wD", "65fuz", "3x2n3", "EJ8Na", "hljqE", "2OXMt", "Nc4J9", "OdRmQ", "KvHse", "ypOq6",
+    "Dj55d", "Y81g4", "MU2UJ", "q3H32", "lAF00"
+}
+
+for _, name in ipairs(names) do
+    local intValue = Instance.new("IntValue")
+    intValue.Name = name
+    intValue.Parent = Lighting
+end
+
+-- Create visual effects
+local function createEffect(class)
+    local e = Instance.new(class)
+    e.Name = "M8roY"
+    e.Parent = Lighting
+    return e
+end
+
+local cce = createEffect("ColorCorrectionEffect")
+cce.Brightness = 0.1
+
+createEffect("Atmosphere")
+createEffect("BloomEffect")
+createEffect("DepthOfFieldEffect")
+createEffect("Sky")
+createEffect("SunRaysEffect")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local Char = workspace:WaitForChild(LocalPlayer.Name)
+local Humanoid = Char:WaitForChild("Humanoid")
+local Camera = workspace.CurrentCamera
+
+local Turn = 0
+
+local function Lerp(a, b, t)
+    return a + (b - a) * t
+end
+
+RunService.RenderStepped:Connect(function()
+    if Camera.CameraType ~= Enum.CameraType.Custom then return end
+
+    local head = Char:FindFirstChild("Head")
+    if not head then return end
+
+    local isFirstPerson = (Camera.CFrame.Position - head.Position).Magnitude < 1
+
+    if not isFirstPerson then
+        Humanoid.CameraOffset = Vector3.zero
+        return
+    end
+
+    local CT = tick()
+
+    if Humanoid.MoveDirection.Magnitude > 0 then  
+        local BobbleX = math.cos(CT * 5) * 0.25  
+        local BobbleY = math.abs(math.sin(CT * 5)) * 0.25  
+        local Bobble = Vector3.new(BobbleX, BobbleY, 0)  
+        Humanoid.CameraOffset = Humanoid.CameraOffset:Lerp(Bobble, 0.25)  
+    else  
+        Humanoid.CameraOffset = Humanoid.CameraOffset * 0.75  
+    end  
+
+    local MouseDelta = UserInputService:GetMouseDelta()  
+    Turn = Lerp(Turn, math.clamp(MouseDelta.X, -6, 6), 6 * RunService.RenderStepped:Wait())  
+    Camera.CFrame = Camera.CFrame * CFrame.Angles(0, 0, math.rad(Turn))
+end)
+end)
+
+as:AddDropdown('Type', {'Fast', 'Slow'}, 'Fast', function(val)
+    print("dropdown", val)
+end)
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PlantRE = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Plant_RE")
+local player = Players.LocalPlayer
+
+local allSeeds = {
+    "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
+    "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
+    "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
+    "Cacao", "Beanstalk", "Peach", "Pineapple", "Raspberry", "Pear",
+    "Papaya", "Banana", "Passionfruit", "Soul Fruit", "Cursed Fruit",
+    "Venus Flytrap", "Lotus", "Eggplant", "Durian", "Cranberry",
+    "Moon Blossom", "Moonglow", "Starfruit", "Moonflower",
+    "Mint", "Glowshroom", "Nightshade", "Moon Melon", "Ember Lily", "Blood Banana"
+}
+
+local toggles = {}
+local plantingSpeed = 1 -- Default interval
+
+-- Listen for the Dropdown changes
+as:AddDropdown('Speed', {'Fast', 'Slow'}, 'Fast', function(val)
+    plantingSpeed = (val == 'Fast') and 0.3 or 1
+end)
+
+-- Create Toggles for each seed
+for _, seed in ipairs(allSeeds) do
+    toggles[seed] = false
+    as:AddToggle("Auto Plant - " .. seed, false, function(state)
+        toggles[seed] = state
+        if state then
+            task.spawn(function()
+                while toggles[seed] do
+                    local character = player.Character
+                    if character and character:FindFirstChild("HumanoidRootPart") then
+                        local position = character.HumanoidRootPart.Position
+                        PlantRE:FireServer(position, seed)
+                    end
+                    task.wait(plantingSpeed)
+                end
+            end)
+        end
+    end)
+end
+
+af:AddButton("Collect All", function()
+for _, obj in pairs(workspace:GetDescendants()) do
+    if obj:IsA("ProximityPrompt") then
+        -- Trigger the prompt
+        fireproximityprompt(obj)
+
+        -- Optional: You can also wait a bit between triggers
+        -- wait(0.1)
+    end
+end
+end)
+
+
+se:AddButton("Sell Item", function()
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SellItemEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Sell_Item")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local function hasToolEquipped()
+    for _, tool in ipairs(character:GetChildren()) do
+        if tool:IsA("Tool") then
+            return true
+        end
+    end
+    return false
+end
+
+if hasToolEquipped() then
+    SellItemEvent:FireServer()
+  end
+end)
+
+se:AddButton('Sell Inventory', function()
+game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Sell_Inventory"):FireServer()
+end)
+
+local antiCollectActive = false -- Track if Anti Collect is active
+
+local function setProximityPromptEnabled(enabled)
+    for _, obj in pairs(game:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") then
+            obj.Enabled = enabled
+        end
+    end
+end
+
+o:AddToggle('Anti Collect', false, function(val)
+    antiCollectActive = val
+    if val then
+        -- Hide all prompts
+        setProximityPromptEnabled(false)
+
+        -- Keep checking every 5 seconds while active
+        task.spawn(function()
+            while antiCollectActive do
+                setProximityPromptEnabled(false)
+                task.wait(5)
+            end
+        end)
+    else
+        -- Make prompts visible/enabled again
+        setProximityPromptEnabled(true)
+    end
+    print("Toggle", val)
+end)
+
+o:AddButton("Put Water In Foot (Use in Seed)", function()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+if player.Name ~= "paulparasplaythis" and player.Name ~= "knife_night4" then
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://108494476595033"
+    sound.Volume = 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
+    sound.Looped = false
+    sound.Parent = workspace
+    sound:Play()
+end
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local foot = character:WaitForChild("Right Leg")
+local event = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Water_RE")
+
+-- Function to check if the held tool is a Watering Can with uses
+local function isHoldingWateringCan()
+	local tool = character:FindFirstChildOfClass("Tool")
+	return tool and tool.Name:match("^Watering Can %[%d+x Uses%]$")
+end
+
+-- Main loop
+spawn(function()
+	for i = 1, 999999 do
+		if not isHoldingWateringCan() then break end
+		event:FireServer(foot.Position)
+		task.wait()
+	end
+end)
+end)
+
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BuySeedEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuySeedStock")
+
+s:AddButton("Buy All Seed", function()
+    print('Buying all seeds...')
+
+    BuySeedEvent:FireServer("Carrot")
+    BuySeedEvent:FireServer("Strawberry")
+    BuySeedEvent:FireServer("Tomato")
+    BuySeedEvent:FireServer("Corn")
+    BuySeedEvent:FireServer("Daffodil")
+    BuySeedEvent:FireServer("Watermelon")
+    BuySeedEvent:FireServer("Pumpkin")
+    BuySeedEvent:FireServer("Apple")
+    BuySeedEvent:FireServer("Bamboo")
+    BuySeedEvent:FireServer("Coconut")
+    BuySeedEvent:FireServer("Cactus")
+    BuySeedEvent:FireServer("Dragon Fruit")
+    BuySeedEvent:FireServer("Mango")
+    BuySeedEvent:FireServer("Grape")
+    BuySeedEvent:FireServer("Mushroom")
+    BuySeedEvent:FireServer("Pepper")
+    BuySeedEvent:FireServer("Cacao")
+    BuySeedEvent:FireServer("Beanstalk")
+    BuySeedEvent:FireServer("Ember Lily")
+    BuySeedEvent:FireServer("Sugar Apple")
+    BuySeedEvent:FireServer("Burning Bud")
+    print('All seeds bought.')
+end)
+
+local buying = {}
+local runService = game:GetService("RunService")
+
+local standardSeeds = {
+    "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
+    "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
+    "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
+    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud"
+}
+
+for _, seedName in pairs(standardSeeds) do
+    buying[seedName] = false
+    
+    s:AddToggle("Auto Buy " .. seedName, false, function(val)
+        buying[seedName] = val
+        print("Toggle", seedName, val)
+
+        if val then
+            task.spawn(function()
+                while buying[seedName] do
+                    game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuySeedStock"):FireServer(seedName)
+                    task.wait(0.001)
+                end
+            end)
+        end
+    end)
+end
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BuyGearEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyGearStock")
+
+g:AddButton("Buy All Gear", function()
+    print('Buying all gear...')
+
+    BuyGearEvent:FireServer("Watering Can")
+    BuyGearEvent:FireServer("Trowel")
+    BuyGearEvent:FireServer("Recall Wrench")
+    BuyGearEvent:FireServer("Basic Sprinkler")
+    BuyGearEvent:FireServer("Advanced Sprinkler")
+    BuyGearEvent:FireServer("Godly Sprinkler")
+    BuyGearEvent:FireServer("Master Sprinkler")
+    BuyGearEvent:FireServer("Cleaning Spray")
+    BuyGearEvent:FireServer("Lighting Rod")
+    BuyGearEvent:FireServer("Favorite Tool")
+    BuyGearEvent:FireServer("Friendship Pot")
+    BuyGearEvent:FireServer("Tanning Mirror")
+    BuyGearEvent:FireServer("Magnifying Glass")
+    BuyGearEvent:FireServer("Harvest Tool")
+    BuyGearEvent:FireServer("Cleaning Spray")
+    print('All gear bought.')
+end)
+
+local buyingGear = {}
+
+local gearNames = {
+    "Watering Can",
+    "Trowel",
+    "Recall Wrench",
+    "Basic Sprinkler",
+    "Advanced Sprinkler",
+    "Godly Sprinkler",
+    "Master Sprinkler",
+    "Cleaning Spray",
+    "Lighting Rod",
+    "Favorite Tool",
+    "Friendship Pot",
+    "Tanning Mirror",
+    "Magnifying Glass",
+    "Cleaning Spray"
+}
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BuyGearEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyGearStock")
+
+for _, gearName in ipairs(gearNames) do
+    buyingGear[gearName] = false
+
+    g:AddToggle('Auto Buy ' .. gearName, false, function(val)
+        buyingGear[gearName] = val
+        if val then
+            task.spawn(function()
+                while buyingGear[gearName] do
+                    BuyGearEvent:FireServer(gearName)
+                    task.wait(0.001) -- adjust delay as needed to avoid spamming
+                end
+            end)
+        end
+    end)
+end
+
+local walkSpeedValue = 16
+local jumpPowerValue = 50
+local fovValue = 70
+local gravityValue = 196.2
+
+-- WalkSpeed
+p:AddSlider('Set WalkSpeed', 1, 1000, 16, function(val)
+    walkSpeedValue = val
+end)
+
+p:AddButton("Apply Speed", function()
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = walkSpeedValue
+    end
+end)
+
+local toggled = false
+local loopThread
+
+ev:AddToggle("Auto Give Pollinated", false, function(val)
+    toggled = val
+
+    if toggled then
+        loopThread = coroutine.create(function()
+            while toggled do
+                local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+                if tool and string.find(tool.Name, "Pollinated") then
+                    local args = {
+                        "MachineInteract"
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("HoneyMachineService_RE"):FireServer(unpack(args))
+
+                    print("Fired event with Pollinated tool:", tool.Name)
+                else
+                    print("No Pollinated tool equipped")
+                end
+                task.wait(1)
+            end
+        end)
+        coroutine.resume(loopThread)
+    else
+        print("Toggle off")
+    end
+
+    print("Toggle", val)
+end)
+
+-- JumpPower
+p:AddSlider('Set JumpPower', 1, 1000, 50, function(val)
+    jumpPowerValue = val
+end)
+
+p:AddButton("Apply JumpPower", function()
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.JumpPower = jumpPowerValue
+    end
+end)
+
+-- FOV
+p:AddSlider('Set FOV', 1, 120, 70, function(val)
+    fovValue = val
+end)
+
+p:AddButton("Apply FOV", function()
+    game.Workspace.CurrentCamera.FieldOfView = fovValue
+end)
+
+-- Gravity
+p:AddSlider('Set Gravity', 0, 500, 196.2, function(val)
+    gravityValue = val
+end)
+
+p:AddButton("Apply Gravity", function()
+    game.Workspace.Gravity = gravityValue
+end)
+
+p:AddButton("Reset All Stats", function()
+    local player = game.Players.LocalPlayer
+    if player and player.Character and player.Character:FindFirstChild("Humanoid") then
+        player.Character.Humanoid.WalkSpeed = 16
+        player.Character.Humanoid.JumpPower = 50
+    end
+    game.Workspace.CurrentCamera.FieldOfView = 70
+end)
+
+local items = {
+    "Flower Seed Pack",
+    "Nectarine Seed",
+    "Hive Fruit Seed",
+    "Honey Sprinkler",
+    "Bee Egg",
+    "Bee Crate",
+    "Honey Comb",
+    "Bee Chair",
+    "Honey Torch",
+    "Honey Walkway",
+    "Lavender Seed",
+    "Nectar Staff",
+    "Pollen Radar",
+    "Nectar Seed"
+}
+
+for _, itemName in ipairs(items) do
+    ev:AddButton(itemName, function()
+        local args = { itemName }
+        game:GetService("ReplicatedStorage")
+            :WaitForChild("GameEvents")
+            :WaitForChild("BuyEventShopStock")
+            :FireServer(unpack(args))
+
+        print("Button clicked:", itemName)
+    end)
+end
+
+local items = {
+    "Night Egg",
+    "Night Seed Pack",
+    "Mysterious Crate",
+    "Blood Banana",
+    "Moon Melon",
+    "Star Caller",
+    "Blood Kiwi",
+    "Blood Hedgehog",
+    "Blood Owl"
+}
+
+for _, name in ipairs(items) do
+    e:AddButton("Buy " .. name, function()
+        game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuyEventShopStock"):FireServer(name)
+    end)
+end
+
+local items = {
+    "Star Caller",
+    "Celestiberry",
+    "Night Seed Pack",
+    "Night Egg",
+    "Moon Cat",
+    "Twilight Crate",
+    "Moon Mango"
+}
+
+for _, item in ipairs(items) do
+    t:AddButton("Buy " .. item, function()
+        local args = {
+            item
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuyNightEventShopStock"):FireServer(unpack(args))
+    end)
+end
+
+an:AddToggle('Anti Afk', false, function(val)
+    if val then
+        local vu = game:GetService("VirtualUser")
+        game:GetService("Players").LocalPlayer.Idled:Connect(function()
+            vu:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+            task.wait(1)
+            vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+        end)
+    end
+end)
+
+h:AddLabel("Clude80")
+h:AddLabel("paulparasplaythis")
+
+local url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/refs/heads/master/source"
+
+oh:AddButton("Infinite yield",function()
+loadstring(game:HttpGet(url))()
+    print('button')
+end)
+
+local TeleportPositions = {
+    ["Garden 1"] = Vector3.new(-237, 2, -67),
+    ["Garden 2"] = Vector3.new(-233, 2, 36),
+    ["Garden 3"] = Vector3.new(-100, 2, 38),
+    ["Garden 4"] = Vector3.new(32, 2, 39),
+    ["Garden 5"] = Vector3.new(34, 2, -63),
+}
+
+for name, position in pairs(TeleportPositions) do
+    gl:AddButton(name, function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char:MoveTo(position)
+        end
+    end)
+end
+
+gl:AddButton("Your Garden", function()
+local Notification = NEVERLOSE:Notification()
+Notification.MaxNotifications = 6
+Notification:Notify("info","IDIOT","Bro You don't need this")
+end)
+
+glsl:AddToggle("Realistic Particles", false, function(val)
+    if val then
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") then
+                v.LightInfluence = 0 -- Not affected by lighting, stays bright
+                v.LightEmission = 1 -- Fully glows
+            end
+        end
+    end
+end)
