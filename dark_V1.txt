@@ -59,7 +59,7 @@ for _, v in ipairs(game:GetDescendants()) do
   end
 end)
 
-var:AddButton("Set all to rainbow", function()
+var:AddButton("Set all to gold", function()
 for _, v in ipairs(game:GetDescendants()) do
     if v:IsA("StringValue") and v.Name == "Variant" then
         v.Value = "Gold"
