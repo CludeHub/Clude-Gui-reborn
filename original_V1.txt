@@ -49,7 +49,7 @@ local admin = P:AddSection('Admin Section',"right")
 local as = F:AddSection('Auto Plant',"left")
 local af = F:AddSection('Auto Fruit',"right")
 local o = F:AddSection('Other',"right")
-local var = F:AddSection('Variants FE,"right")
+local var = F:AddSection('Variants FE',"right")
 
 var:AddButton("Set all to rainbow", function()
 for _, v in ipairs(game:GetDescendants()) do
