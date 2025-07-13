@@ -51,6 +51,7 @@ local af = F:AddSection('Auto Fruit',"right")
 local o = F:AddSection('Other',"right")
 
 local runService = game:GetService("RunService")
+local runService = game:GetService("RunService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local event = replicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetMutationMachineService_RE")
 
@@ -63,8 +64,12 @@ end)
 runService.RenderStepped:Connect(function()
 	if autoSubmit then
 		local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
-		if tool and string.find(tool.Name, "Age 50") then
-			event:FireServer("SubmitHeldPet")
+		if tool then
+			local age = string.match(tool.Name, "Age (%d+)")
+			age = tonumber(age)
+			if age and age >= 50 and age <= 100 then
+				event:FireServer("SubmitHeldPet")
+			end
 		end
 	end
 end)
