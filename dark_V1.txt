@@ -25,11 +25,11 @@ local G = Window:AddTab('Config','gear')
 local glsl = G:AddSection('Shader',"left")
 
 local pet = egg:AddSection('Auto Buy',"left")
+local mutation = egg:AddSection('Pet Mutation',"right")
 
 local h = H:AddSection('Credit',"left")
 local oh = H:AddSection('Other',"right")
 
-local i = I:AddSection('Shop',"left")
 local gl = I:AddSection('Gardens',"right")
 
 local se = S:AddSection('Sell',"left")
@@ -49,6 +49,28 @@ local admin = P:AddSection('Admin Section',"right")
 local as = F:AddSection('Auto Plant',"left")
 local af = F:AddSection('Auto Fruit',"right")
 local o = F:AddSection('Other',"right")
+
+local runService = game:GetService("RunService")
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local event = replicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetMutationMachineService_RE")
+
+local autoSubmit = false
+
+mutation:AddToggle('Auto Submit Pet', false, function(val)
+	autoSubmit = val
+end)
+
+runService.RenderStepped:Connect(function()
+	if autoSubmit then
+		local tool = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Tool")
+		if tool and string.find(tool.Name, "Age 50") then
+			event:FireServer("SubmitHeldPet")
+		end
+	end
+end)
+
+mutation:AddLabel("Age 50 pet needed")
+
 
 glsl:AddButton("Dupe", function()
 -- Get the player and character
@@ -78,18 +100,30 @@ print("Cloned tool and handle created with the original names.")
 end)
 
 
-local eggIDs = {
-    ["Pet Egg 1"] = 1,
-    ["Pet Egg 2"] = 2,
-    ["Pet Egg 3"] = 3
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local BuyPetEgg = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyPetEgg")
+
+local Toggles = {}
+local Eggs = {
+    "Common Egg",
+    "Common Summer Egg",
+    "Rare Summer Egg",
+    "Mythical Egg",
+    "Paradise Egg",
+    "Bug Egg"
 }
 
-for eggName, eggId in pairs(eggIDs) do
-    pet:AddToggle(eggName, false, function(val)
+for _, eggName in ipairs(Eggs) do
+    Toggles[eggName] = false
+    pet:AddToggle('Auto Buy ' .. eggName, false, function(val)
+        Toggles[eggName] = val
         if val then
-            local args = {eggId}
-            game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("BuyPetEgg"):FireServer(unpack(args))
-            print(eggName .. " purchased")
+            task.spawn(function()
+                while Toggles[eggName] do
+                    BuyPetEgg:FireServer(eggName)
+                    task.wait(0.5) -- Adjust delay if needed to prevent server kick
+                end
+            end)
         end
     end)
 end
@@ -780,7 +814,7 @@ RunService.RenderStepped:Connect(function()
 end)
 end)
 
-as:AddDropdown('Type', {'Fast', 'Slow'}, 'Fast', function(val)
+as:AddDropdown('Type', {'Fast', 'Slow'}, 'Slow', function(val)
     print("dropdown", val)
 end)
 
@@ -793,7 +827,7 @@ local allSeeds = {
     "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
     "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
     "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
-    "Cacao", "Beanstalk", "Peach", "Pineapple", "Raspberry", "Pear",
+    "Cacao", "Beanstalk", "Peach", "Pineapple", "Raspberry", "Pear", "Burning Bud", "Giant Pinecone",
     "Papaya", "Banana", "Passionfruit", "Soul Fruit", "Cursed Fruit",
     "Venus Flytrap", "Lotus", "Eggplant", "Durian", "Cranberry",
     "Moon Blossom", "Moonglow", "Starfruit", "Moonflower",
@@ -804,7 +838,7 @@ local toggles = {}
 local plantingSpeed = 1 -- Default interval
 
 -- Listen for the Dropdown changes
-as:AddDropdown('Speed', {'Fast', 'Slow'}, 'Fast', function(val)
+as:AddDropdown('Speed', {'Fast', 'Slow'}, 'Slow', function(val)
     plantingSpeed = (val == 'Fast') and 0.3 or 1
 end)
 
@@ -958,6 +992,7 @@ s:AddButton("Buy All Seed", function()
     BuySeedEvent:FireServer("Ember Lily")
     BuySeedEvent:FireServer("Sugar Apple")
     BuySeedEvent:FireServer("Burning Bud")
+    BuySeedEvent:FireServer("Giant Pinecone")
     print('All seeds bought.')
 end)
 
@@ -968,7 +1003,7 @@ local standardSeeds = {
     "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
     "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
     "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
-    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud"
+    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud", "Giant Pinecone"
 }
 
 for _, seedName in pairs(standardSeeds) do
@@ -1009,7 +1044,10 @@ g:AddButton("Buy All Gear", function()
     BuyGearEvent:FireServer("Tanning Mirror")
     BuyGearEvent:FireServer("Magnifying Glass")
     BuyGearEvent:FireServer("Harvest Tool")
-    BuyGearEvent:FireServer("Cleaning Spray")
+    BuyGearEvent:FireServer("Medium Toy")
+    BuyGearEvent:FireServer("Medium Treat")
+    BuyGearEvent:FireServer("Levelup Lollipop")
+
     print('All gear bought.')
 end)
 
@@ -1029,7 +1067,9 @@ local gearNames = {
     "Friendship Pot",
     "Tanning Mirror",
     "Magnifying Glass",
-    "Cleaning Spray"
+    "Medium Toy",
+    "Medium Treat",
+    "Levelup Lollipop"
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
