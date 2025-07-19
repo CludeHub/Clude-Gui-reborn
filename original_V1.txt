@@ -26,18 +26,6 @@ local egg = Window:AddTab('Pet Eggs','egg')
 local G = Window:AddTab('Config','gear')
 local glsl = G:AddSection('Shader',"left")
 
-local Chi = E:AddSection('Auto Submits Tanquil',"right")
-local zenshop = E:AddSection('Zen Shop',"left")
-local pan = E:AddSection('Tanoki Chi',"right")
-local e = E:AddSection('Blood Moon Shop',"left")
-local t = E:AddSection('Twilight Shop',"right")
-local ev = E:AddSection('Bee Shop',"left")
-local sum = E:AddSection('Summer Event',"right")
-e:Hide()
-t:Hide()
-ev:Hide()
-sum:Hide()
-
 local pet = egg:AddSection('Auto Buy',"left")
 local mutation = egg:AddSection('Pet Mutation',"right")
 
@@ -59,117 +47,14 @@ local as = F:AddSection('Auto Plant',"left")
 local af = F:AddSection('Auto Fruit',"right")
 local o = F:AddSection('Other',"right")
 local var = F:AddSection('Variants FE',"right")
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
-
-local ZenQuestRemote = ReplicatedStorage.GameEvents.ZenQuestRemoteEvent
-local ZenAuraRemote = ReplicatedStorage.GameEvents.ZenAuraRemoteEvent
-
-local submitHeldPlantLoop = false
-local submitAllPlantsLoop = false
-
--- Held Plant Submit Loop (ZenQuestRemote)
-Chi:AddToggle('Held Plant Submit (ZenQuest)', false, function(val)
-    submitHeldPlantLoop = val
-    task.spawn(function()
-        while submitHeldPlantLoop do
-            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-            if tool then
-                ZenQuestRemote:FireServer("SubmitHeldPlant")
-            end
-            task.wait(0.5)
-        end
-    end)
-end)
-
--- All Plants Submit (Tranquil Check) (ZenQuestRemote)
-Chi:AddToggle('All Plants (Tranquil)', false, function(val)
-    submitAllPlantsLoop = val
-    task.spawn(function()
-        while submitAllPlantsLoop do
-            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-            if tool and string.find(tool.Name, "Tranquil") then
-                ZenQuestRemote:FireServer("SubmitAllPlants")
-            end
-            task.wait(0.5)
-        end
-    end)
-end)
-
--- Held Plant Submit Loop (ZenAuraRemote)
-pan:AddToggle('Held Plant Submit (ZenAura)', false, function(val)
-    submitHeldPlantLoop = val
-    task.spawn(function()
-        while submitHeldPlantLoop do
-            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-            if tool then
-                ZenAuraRemote:FireServer("SubmitHeldPlant")
-            end
-            task.wait(0.5)
-        end
-    end)
-end)
-
--- All Plants Submit (Tranquil Check) (ZenAuraRemote)
-pan:AddToggle('All Plants (Tranquil)', false, function(val)
-    submitAllPlantsLoop = val
-    task.spawn(function()
-        while submitAllPlantsLoop do
-            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
-            if tool and string.find(tool.Name, "Tranquil") then
-                ZenAuraRemote:FireServer("SubmitAllPlants")
-            end
-            task.wait(0.5)
-        end
-    end)
-end)
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-
-local BuyEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyEventShopStock")
-
-local ChiUI = LocalPlayer.PlayerGui:WaitForChild("ChiCurrency_UI"):WaitForChild("TextLabel1")
-
-local toggles = {
-    ["Zen Seed Pack"] = {enabled = false, price = 12},
-    ["Zen Egg"] = {enabled = false, price = 30},
-    ["Hot Spring"] = {enabled = false, price = 30},
-    ["Zen Sand"] = {enabled = false, price = 15},
-    ["Zenflare"] = {enabled = false, price = 6},
-    ["Zen Crate"] = {enabled = false, price = 15},
-    ["Soft Sunshine"] = {enabled = false, price = 20},
-    ["Koi"] = {enabled = false, price = 45},
-    ["Zen Gnome Crate"] = {enabled = false, price = 15},
-    ["Spiked Mango"] = {enabled = false, price = 75}
-}
-
--- UI toggles
-for itemName, data in pairs(toggles) do
-    zenshop:AddToggle(itemName,false,function(val)
-        data.enabled = val
-        print(itemName.." Toggle:",val)
-    end)
-end
-
--- Loop
-RunService.RenderStepped:Connect(function()
-    local chi = tonumber(ChiUI.Text)
-    if chi then
-        for itemName, data in pairs(toggles) do
-            if data.enabled and chi >= data.price then
-                BuyEvent:FireServer(itemName)
-                task.wait(0.5) -- Prevent too fast spam
-            end
-        end
-    end
-end)
+local e = E:AddSection('Blood Moon Shop',"left")
+local t = E:AddSection('Twilight Shop',"right")
+local ev = E:AddSection('Bee Shop',"left")
+local sum = E:AddSection('Summer Event',"right")
+e:Hide()
+t:Hide()
+ev:Hide()
+sum:Hide()
 
 var:AddButton("Set all to rainbow", function()
 for _, v in ipairs(game:GetDescendants()) do
@@ -1435,6 +1320,121 @@ glsl:AddToggle("Realistic Particles", false, function(val)
             if v:IsA("ParticleEmitter") then
                 v.LightInfluence = 0 -- Not affected by lighting, stays bright
                 v.LightEmission = 1 -- Fully glows
+            end
+        end
+    end
+end)
+
+local Chi = E:AddSection('Auto Submits Tanquil',"right")
+local zenshop = E:AddSection('Zen Shop',"left")
+local pan = E:AddSection('Tanoki Chi',"right")
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+
+local ZenQuestRemote = ReplicatedStorage.GameEvents.ZenQuestRemoteEvent
+local ZenAuraRemote = ReplicatedStorage.GameEvents.ZenAuraRemoteEvent
+
+local submitHeldPlantLoop = false
+local submitAllPlantsLoop = false
+
+-- Held Plant Submit Loop (ZenQuestRemote)
+Chi:AddToggle('Held Plant Submit (ZenQuest)', false, function(val)
+    submitHeldPlantLoop = val
+    task.spawn(function()
+        while submitHeldPlantLoop do
+            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+            if tool then
+                ZenQuestRemote:FireServer("SubmitHeldPlant")
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+-- All Plants Submit (Tranquil Check) (ZenQuestRemote)
+Chi:AddToggle('All Plants (Tranquil)', false, function(val)
+    submitAllPlantsLoop = val
+    task.spawn(function()
+        while submitAllPlantsLoop do
+            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+            if tool and string.find(tool.Name, "Tranquil") then
+                ZenQuestRemote:FireServer("SubmitAllPlants")
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+-- Held Plant Submit Loop (ZenAuraRemote)
+pan:AddToggle('Held Plant Submit (ZenAura)', false, function(val)
+    submitHeldPlantLoop = val
+    task.spawn(function()
+        while submitHeldPlantLoop do
+            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+            if tool then
+                ZenAuraRemote:FireServer("SubmitHeldPlant")
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+-- All Plants Submit (Tranquil Check) (ZenAuraRemote)
+pan:AddToggle('All Plants (Tranquil)', false, function(val)
+    submitAllPlantsLoop = val
+    task.spawn(function()
+        while submitAllPlantsLoop do
+            local tool = LocalPlayer.Character:FindFirstChildOfClass("Tool")
+            if tool and string.find(tool.Name, "Tranquil") then
+                ZenAuraRemote:FireServer("SubmitAllPlants")
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local BuyEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyEventShopStock")
+
+local ChiUI = LocalPlayer.PlayerGui:WaitForChild("ChiCurrency_UI"):WaitForChild("TextLabel1")
+
+local toggles = {
+    ["Zen Seed Pack"] = {enabled = false, price = 12},
+    ["Zen Egg"] = {enabled = false, price = 30},
+    ["Hot Spring"] = {enabled = false, price = 30},
+    ["Zen Sand"] = {enabled = false, price = 15},
+    ["Zenflare"] = {enabled = false, price = 6},
+    ["Zen Crate"] = {enabled = false, price = 15},
+    ["Soft Sunshine"] = {enabled = false, price = 20},
+    ["Koi"] = {enabled = false, price = 45},
+    ["Zen Gnome Crate"] = {enabled = false, price = 15},
+    ["Spiked Mango"] = {enabled = false, price = 75}
+}
+
+-- UI toggles
+for itemName, data in pairs(toggles) do
+    zenshop:AddToggle(itemName,false,function(val)
+        data.enabled = val
+        print(itemName.." Toggle:",val)
+    end)
+end
+
+-- Loop
+RunService.RenderStepped:Connect(function()
+    local chi = tonumber(ChiUI.Text)
+    if chi then
+        for itemName, data in pairs(toggles) do
+            if data.enabled and chi >= data.price then
+                BuyEvent:FireServer(itemName)
+                task.wait(0.5) -- Prevent too fast spam
             end
         end
     end
