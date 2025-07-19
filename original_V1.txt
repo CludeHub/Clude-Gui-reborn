@@ -2,7 +2,9 @@ game.Players.LocalPlayer.PlayerGui.Teleport_UI.Frame.Gear.Visible = true
 game.Players.LocalPlayer.PlayerGui.Teleport_UI.Frame.Pets.Visible = true 
 
 local NEVERLOSE = loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeHub/SourceCludeLib/refs/heads/main/NerverLoseLibEdited.lua"))()
+local LOADER = loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeHub/SourceCludeLib/refs/heads/main/loader.Function.lua"))()
 
+LOADER:Add(function()
 local TextHub = "CludeHub"
 local Text = "GROW A GARDEN"
 
@@ -1318,4 +1320,5 @@ glsl:AddToggle("Realistic Particles", false, function(val)
             end
         end
     end
+end)
 end)
