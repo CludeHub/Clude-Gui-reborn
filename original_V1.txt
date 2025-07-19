@@ -8,7 +8,6 @@ LOADER:Add(function()
 local TextHub = "CludeHub"
 local Text = "GROW A GARDEN"
 
-		print("Applying Dark Theme...")
 local Window = NEVERLOSE:AddWindow(TextHub,Text,'original')
 Window:AddTabLabel('Home')
 
@@ -1404,7 +1403,7 @@ local RunService = game:GetService("RunService")
 
 local BuyEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyEventShopStock")
 
-local ChiUI = LocalPlayer.PlayerGui:WaitForChild("ChiCurrency_UI"):WaitForChild("TextLabel1")
+local ChiUI = LocalPlayer.PlayerGui:WaitForChild("ChiCurrency_UI"):WaitForChild("Frame"):WaitForChild("TextLabel1")
 
 local toggles = {
     ["Zen Seed Pack"] = {enabled = false, price = 12},
