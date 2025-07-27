@@ -593,10 +593,6 @@ Lighting.FogStart = 99999999
 Lighting.FogEnd = 99999999
 Lighting.FogColor = Color3.new(1, 1, 1)
 
-local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
-if atmosphere then
-    atmosphere:Destroy()
-end
 -- Create dummy IntValues
 local names = {
     "P9TC2", "vA5C3", "DR9ww", "0nurp", "R94w0", "cr0VR", "3ow3N", "s0Gz6", "54hV8", "xB5jv",
@@ -706,11 +702,6 @@ Lighting.EnvironmentDiffuseScale = 0.203
 Lighting.FogStart = 99999999
 Lighting.FogEnd = 99999999
 Lighting.FogColor = Color3.new(1, 1, 1)
-
-local atmosphere = Lighting:FindFirstChildOfClass("Atmosphere")
-if atmosphere then
-    atmosphere:Destroy()
-end
 
 -- Create dummy IntValues
 local names = {
