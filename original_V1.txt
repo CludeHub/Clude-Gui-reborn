@@ -684,36 +684,6 @@ for _, particle in ipairs(workspace:GetDescendants()) do
     end
 end
 
-local camera = workspace.CurrentCamera
-local blurAmount = 10
-local blurAmplifier = 5
-local lastVector = camera.CFrame.LookVector
-
-local motionBlur = Instance.new("BlurEffect", camera)
-
-local runService = game:GetService("RunService")
-
-workspace.Changed:Connect(function(property)
-    if property == "CurrentCamera" then
-        local camera = workspace.CurrentCamera
-        if motionBlur and motionBlur.Parent then
-            motionBlur.Parent = camera
-        else
-            motionBlur = Instance.new("BlurEffect", camera)
-        end
-    end
-end)
-
-runService.Heartbeat:Connect(function()
-    if not motionBlur or motionBlur.Parent == nil then
-        motionBlur = Instance.new("BlurEffect", camera)
-    end
-
-    local magnitude = (camera.CFrame.LookVector - lastVector).magnitude
-    motionBlur.Size = math.abs(magnitude)*blurAmount*blurAmplifier/2
-    lastVector = camera.CFrame.LookVector
-end)
-
 local Lighting = game:GetService("Lighting")
 
 -- Apply lighting settings (no fog) with daytime
@@ -726,7 +696,7 @@ Lighting.GeographicLatitude = -15.12
 Lighting.Ambient = Color3.new(0.007843137718737125, 0.007843137718737125, 0.007843137718737125)
 Lighting.OutdoorAmbient = Color3.new(0.2, 0.21176470816135406, 0.26274511218070984)
 Lighting.ExposureCompensation = 0.85
-Lighting.Brightness = 3.25
+Lighting.Brightness = 2
 Lighting.ColorShift_Top = Color3.new(1, 0.9686274528503418, 0.929411768913269)
 Lighting.EnvironmentDiffuseScale = 0.203
 Lighting.FogStart = 1e10
