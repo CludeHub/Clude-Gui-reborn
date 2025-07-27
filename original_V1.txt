@@ -588,11 +588,6 @@ Lighting.Brightness = 3.25
 Lighting.ColorShift_Top = Color3.new(1, 0.9686274528503418, 0.929411768913269)
 Lighting.EnvironmentDiffuseScale = 0.203
 
--- Clear any existing fog settings
-Lighting.FogStart = 99999999
-Lighting.FogEnd = 99999999
-Lighting.FogColor = Color3.new(1, 1, 1)
-
 -- Create dummy IntValues
 local names = {
     "P9TC2", "vA5C3", "DR9ww", "0nurp", "R94w0", "cr0VR", "3ow3N", "s0Gz6", "54hV8", "xB5jv",
@@ -669,6 +664,14 @@ RunService.RenderStepped:Connect(function()
     Turn = Lerp(Turn, math.clamp(MouseDelta.X, -6, 6), 6 * RunService.RenderStepped:Wait())  
     Camera.CFrame = Camera.CFrame * CFrame.Angles(0, 0, math.rad(Turn))
 end)
+wait(4)
+Lighting.FogEnd = 100000
+	for i,v in pairs(Lighting:GetDescendants()) do
+		if v:IsA("Atmosphere") then
+			v:Destroy()
+		end
+	end
+end
 end)
 
 glsl:AddButton('RTX Day', function()
@@ -699,9 +702,6 @@ Lighting.ExposureCompensation = 0.85
 Lighting.Brightness = 2
 Lighting.ColorShift_Top = Color3.new(1, 0.9686274528503418, 0.929411768913269)
 Lighting.EnvironmentDiffuseScale = 0.203
-Lighting.FogStart = 99999999
-Lighting.FogEnd = 99999999
-Lighting.FogColor = Color3.new(1, 1, 1)
 
 -- Create dummy IntValues
 local names = {
@@ -776,6 +776,13 @@ RunService.RenderStepped:Connect(function()
     Turn = Lerp(Turn, math.clamp(MouseDelta.X, -6, 6), 6 * RunService.RenderStepped:Wait())  
     Camera.CFrame = Camera.CFrame * CFrame.Angles(0, 0, math.rad(Turn))
 end)
+wait(3)
+Lighting.FogEnd = 100000
+	for i,v in pairs(Lighting:GetDescendants()) do
+		if v:IsA("Atmosphere") then
+			v:Destroy()
+		end
+	end
 end)
 
 as:AddDropdown('Type', {'Fast', 'Slow'}, 'Slow', function(val)
