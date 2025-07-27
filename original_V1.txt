@@ -630,7 +630,7 @@ local function SetupLighting(clockTime, brightness)
 	Lighting.EnvironmentDiffuseScale = 0.203
 
 	-- Clear fog
-	Lighting.FogStart = 1e10
+	Lighting.FogStart = 0
 	Lighting.FogEnd = 1e10
 	Lighting.FogColor = Color3.new(1, 1, 1)
 
