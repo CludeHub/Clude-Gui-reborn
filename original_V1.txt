@@ -1291,15 +1291,3 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 end)
-local Lighting = game:GetService("Lighting")
-
--- Remove fog
-Lighting.FogEnd = 100000
-Lighting.FogStart = 0
-
--- Remove all Atmosphere instances
-for _, v in ipairs(Lighting:GetDescendants()) do
-	if v:IsA("Atmosphere") then
-		v:Destroy()
-	end
-end
