@@ -31,7 +31,7 @@ local mutation = egg:AddSection('Pet Mutation',"right")
 local h = H:AddSection('Credit',"left")
 local oh = H:AddSection('Other',"right")
 
-local gl = I:AddSection('Gardens',"right")
+local gl = I:AddSection('Gardens',"left")
 
 local se = S:AddSection('Sell',"left")
 
@@ -730,7 +730,7 @@ local allSeeds = {
     "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
     "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
     "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
-    "Cacao", "Beanstalk", "Peach", "Pineapple", "Raspberry", "Pear", "Burning Bud", "Giant Pinecone",
+    "Cacao", "Beanstalk", "Peach", "Pineapple", "Raspberry", "Pear", "Burning Bud", "Giant Pinecone", "Elder Strawberry",
     "Papaya", "Banana", "Passionfruit", "Soul Fruit", "Cursed Fruit",
     "Venus Flytrap", "Lotus", "Eggplant", "Durian", "Cranberry",
     "Moon Blossom", "Moonglow", "Starfruit", "Moonflower",
@@ -896,6 +896,7 @@ s:AddButton("Buy All Seed", function()
     BuySeedEvent:FireServer("Sugar Apple")
     BuySeedEvent:FireServer("Burning Bud")
     BuySeedEvent:FireServer("Giant Pinecone")
+    BuySeedEvent:FireServer("Elder Strawberry")
     print('All seeds bought.')
 end)
 
@@ -906,7 +907,7 @@ local standardSeeds = {
     "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
     "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
     "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
-    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud", "Giant Pinecone"
+    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry"
 }
 
 for _, seedName in pairs(standardSeeds) do
@@ -941,7 +942,6 @@ g:AddButton("Buy All Gear", function()
     BuyGearEvent:FireServer("Godly Sprinkler")
     BuyGearEvent:FireServer("Master Sprinkler")
     BuyGearEvent:FireServer("Cleaning Spray")
-    BuyGearEvent:FireServer("Lighting Rod")
     BuyGearEvent:FireServer("Favorite Tool")
     BuyGearEvent:FireServer("Friendship Pot")
     BuyGearEvent:FireServer("Tanning Mirror")
@@ -965,9 +965,9 @@ local gearNames = {
     "Godly Sprinkler",
     "Master Sprinkler",
     "Cleaning Spray",
-    "Lighting Rod",
     "Favorite Tool",
     "Friendship Pot",
+    "Harvest Tool",
     "Tanning Mirror",
     "Magnifying Glass",
     "Medium Toy",
