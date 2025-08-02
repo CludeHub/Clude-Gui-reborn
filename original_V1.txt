@@ -950,6 +950,7 @@ g:AddButton("Buy All Gear", function()
     BuyGearEvent:FireServer("Medium Toy")
     BuyGearEvent:FireServer("Medium Treat")
     BuyGearEvent:FireServer("Levelup Lollipop")
+    BuyGearEvent:FireServer("Trading Ticket")
 
     print('All gear bought.')
 end)
@@ -972,7 +973,8 @@ local gearNames = {
     "Magnifying Glass",
     "Medium Toy",
     "Medium Treat",
-    "Levelup Lollipop"
+    "Levelup Lollipop",
+    "Trading Ticket"
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
