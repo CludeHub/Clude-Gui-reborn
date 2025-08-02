@@ -1205,6 +1205,35 @@ end)
 local Chi = E:AddSection('Auto Submits Tanquil',"right")
 local zenshop = E:AddSection('Zen Shop',"left")
 local pan = E:AddSection('Tanoki Chi',"right")
+local kitsune = E:AddSection('Kitsune Chest Farm',"left")
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local player = Players.LocalPlayer
+local remote = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("ZenQuestRemoteEvent")
+
+local autoGive = false
+
+kitsune:AddToggle('Auto give held plant', false, function(val)
+    autoGive = val
+    
+    if autoGive then
+        task.spawn(function()
+            while autoGive do
+                task.wait(0.2) -- adjust delay as needed
+                
+                local character = player.Character
+                if character then
+                    local tool = character:FindFirstChildOfClass("Tool")
+                    if tool and (tool.Name:lower():find("tranquil") or tool.Name:lower():find("corrupt")) then
+                        remote:FireServer("SubmitToFox")
+                    end
+                end
+            end
+        end)
+    end
+end)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
