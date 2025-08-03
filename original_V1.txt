@@ -786,10 +786,6 @@ end
 wait(1)
 end)
 
-as:AddDropdown('Type', {'Fast', 'Slow'}, 'Slow', function(val)
-    print("dropdown", val)
-end)
-
 
 af:AddButton("Collect All", function()
 for _, obj in pairs(workspace:GetDescendants()) do
@@ -1000,7 +996,8 @@ local gearNames = {
     "Medium Toy",
     "Medium Treat",
     "Levelup Lollipop",
-    "Trading Ticket"
+    "Trading Ticket",
+    "Grandmaster Sprinkler"
 }
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -1234,7 +1231,7 @@ end)
 local dishesLeft = {"Soup","Salad","Sandwich","Pie","Waffle","HotDog"}
 local dishesRight = {"IceCream","Donut","Pizza","Burger","Cake","Sushi"}
 
--- All recipe data table (5 ingredients each where applicable)
+-- All recipe data table
 local recipes = {
     -- Soup
     SoupVeryCommon = {"Carrot","Carrot","Carrot","Carrot","Carrot"},
@@ -1325,8 +1322,23 @@ local recipes = {
     SushiRare = {"Bamboo","Corn","Maple Apple","Bamboo","Corn"},
     SushiLegendary = {"Bamboo","Corn","Maple Apple","Apple","Bamboo"},
     SushiDivine = {"Bamboo","Corn","Bone Blossom","Bone Blossom","Bone Blossom"},
-    -- Prismatic Sushi is not confirmed in wiki
+    -- SushiPrismatic is unconfirmed
 }
+
+-- Helper: find tool by partial name
+local function findTool(partialName, Backpack, Character)
+    for _, tool in ipairs(Character:GetChildren()) do
+        if tool:IsA("Tool") and string.find(tool.Name, partialName) then
+            return tool
+        end
+    end
+    for _, tool in ipairs(Backpack:GetChildren()) do
+        if tool:IsA("Tool") and string.find(tool.Name, partialName) then
+            return tool
+        end
+    end
+    return nil
+end
 
 -- Function to create section with buttons for all rarities
 local function addButtonsForDish(dish, side)
@@ -1347,7 +1359,7 @@ local function addButtonsForDish(dish, side)
             end
 
             for _, item in ipairs(chosen) do
-                local tool = Backpack:FindFirstChild(item) or Character:FindFirstChild(item)
+                local tool = findTool(item, Backpack, Character)
                 if tool then
                     if Backpack:FindFirstChild(tool.Name) then
                         LocalPlayer.Character.Humanoid:EquipTool(tool)
