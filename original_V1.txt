@@ -721,49 +721,6 @@ as:AddDropdown('Type', {'Fast', 'Slow'}, 'Slow', function(val)
     print("dropdown", val)
 end)
 
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local PlantRE = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Plant_RE")
-local player = Players.LocalPlayer
-
-local allSeeds = {
-    "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
-    "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
-    "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
-    "Cacao", "Beanstalk", "Peach", "Pineapple", "Raspberry", "Pear", "Burning Bud", "Giant Pinecone", "Elder Strawberry",
-    "Papaya", "Banana", "Passionfruit", "Soul Fruit", "Cursed Fruit",
-    "Venus Flytrap", "Lotus", "Eggplant", "Durian", "Cranberry",
-    "Moon Blossom", "Moonglow", "Starfruit", "Moonflower",
-    "Mint", "Glowshroom", "Nightshade", "Moon Melon", "Ember Lily", "Blood Banana"
-}
-
-local toggles = {}
-local plantingSpeed = 1 -- Default interval
-
--- Listen for the Dropdown changes
-as:AddDropdown('Speed', {'Fast', 'Slow'}, 'Slow', function(val)
-    plantingSpeed = (val == 'Fast') and 0.3 or 1
-end)
-
--- Create Toggles for each seed
-for _, seed in ipairs(allSeeds) do
-    toggles[seed] = false
-    as:AddToggle("Auto Plant - " .. seed, false, function(state)
-        toggles[seed] = state
-        if state then
-            task.spawn(function()
-                while toggles[seed] do
-                    local character = player.Character
-                    if character and character:FindFirstChild("HumanoidRootPart") then
-                        local position = character.HumanoidRootPart.Position
-                        PlantRE:FireServer(position, seed)
-                    end
-                    task.wait(plantingSpeed)
-                end
-            end)
-        end
-    end)
-end
 
 af:AddButton("Collect All", function()
 for _, obj in pairs(workspace:GetDescendants()) do
@@ -951,7 +908,7 @@ g:AddButton("Buy All Gear", function()
     BuyGearEvent:FireServer("Medium Treat")
     BuyGearEvent:FireServer("Levelup Lollipop")
     BuyGearEvent:FireServer("Trading Ticket")
-
+    BuyGearEvent:FireServer("Grandmaster Sprinkler")
     print('All gear bought.')
 end)
 
