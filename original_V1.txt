@@ -1204,5 +1204,143 @@ glsl:AddToggle("Realistic Particles", false, function(val)
     end
 end)
 
-local pan = E:AddSection('Cooking Ingredients',"right")
+-- List of dishes split left/right for cleaner UI
+local dishesLeft = {"Soup","Salad","Sandwich","Pie","Waffle","HotDog"}
+local dishesRight = {"IceCream","Donut","Pizza","Burger","Cake","Sushi"}
+
+-- All recipe data table (5 ingredients each where applicable)
+local recipes = {
+    -- Soup
+    SoupVeryCommon = {"Carrot","Carrot","Carrot","Carrot","Carrot"},
+
+    -- Salad
+    SaladVeryCommon = {"Tomato","Tomato","Tomato","Tomato","Tomato"},
+    SaladCommon = {"Tomato","Tomato","Tomato","Tomato","Corn"},
+    SaladRare = {"Tomato","Corn","Corn","Tomato","Pepper"},
+    SaladLegendary = {"Blood Banana","Blood Banana","Tomato","Tomato","Corn"},
+    SaladDivine = {"Tomato","Giant Pinecone","Bone Blossom","Bone Blossom","Bone Blossom"},
+    SaladPrismatic = {"Tomato","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Sandwich
+    SandwichVeryCommon = {"Tomato","Tomato","Corn","Corn","Corn"},
+    SandwichCommon = {"Tomato","Tomato","Corn"},
+    SandwichRare = {"Tomato","Corn","Pepper","Corn","Tomato"},
+    SandwichLegendary = {"Tomato","Corn","Cacao","Corn","Banana"},
+    SandwichDivine = {"Tomato","Corn","Bone Blossom","Bone Blossom","Bone Blossom"},
+    SandwichPrismatic = {"Tomato","Banana","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Pie
+    PieVeryCommon = {"Corn","Pumpkin","Corn","Pumpkin","Apple"},
+    PieCommon = {"Pumpkin","Apple"},
+    PieRare = {"Pumpkin","Apple","Corn","Corn","Apple"},
+    PieLegendary = {"Pumpkin","Moon Melon","Apple","Apple","Corn"},
+    PieDivine = {"Pumpkin","Sugar Apple","Coconut","Coconut","Coconut"},
+    PiePrismatic = {"Pumpkin","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Waffle
+    WaffleVeryCommon = {"Pumpkin","Watermelon","Corn","Corn","Apple"},
+    WaffleCommon = {"Pumpkin","Watermelon"},
+    WaffleRare = {"Pumpkin","Sugar Apple","Corn","Corn","Pumpkin"},
+    WaffleLegendary = {"Pumpkin","Sugar Apple","Moon Melon","Corn","Pumpkin"},
+    WaffleDivine = {"Sugar Apple","Coconut","Bone Blossom","Bone Blossom","Bone Blossom"},
+    WafflePrismatic = {"Sugarglaze","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Hot Dog
+    HotDogVeryCommon = {"Pepper","Corn","Corn","Corn","Corn"},
+    HotDogCommon = {"Pepper","Corn"},
+    HotDogRare = {"Pepper","Corn","Tomato","Corn","Banana"},
+    HotDogLegendary = {"Pepper","Corn","Moon Melon","Corn","Ember Lily"},
+    HotDogDivine = {"Corn","Ember Lily","Bone Blossom","Bone Blossom","Bone Blossom"},
+    HotDogPrismatic = {"Corn","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Ice Cream
+    IceCreamVeryCommon = {"Corn","Strawberry","Corn","Corn","Corn"},
+    IceCreamCommon = {"Corn","Strawberry"},
+    IceCreamRare = {"Corn","Blueberry","Banana","Corn","Corn"},
+    IceCreamLegendary = {"Banana","Banana","Banana","Corn","Sugar Apple"},
+    IceCreamDivine = {"Banana","Sugar Apple","Bone Blossom","Bone Blossom","Bone Blossom"},
+    IceCreamPrismatic = {"Banana","Sugar Apple","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Donut
+    DonutVeryCommon = {"Corn","Blueberry","Strawberry","Corn","Corn"},
+    DonutCommon = {"Corn","Blueberry","Strawberry"},
+    DonutRare = {"Corn","Strawberry","Tomato","Apple","Corn"},
+    DonutLegendary = {"Blood Banana","Moon Melon","Apple","Corn","Tomato"},
+    DonutDivine = {"Sugar Apple","Corn","Bone Blossom","Bone Blossom","Bone Blossom"},
+    DonutPrismatic = {"Sugarglaze","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Pizza
+    PizzaVeryCommon = {"Banana","Tomato","Corn","Corn","Corn"},
+    PizzaCommon = {"Banana","Tomato"},
+    PizzaRare = {"Corn","Apple","Apple","Tomato","Banana"},
+    PizzaLegendary = {"Corn","Apple","Apple","Pepper","Tomato"},
+    PizzaDivine = {"Tomato","Corn","Pepper","Sugar Apple","Sugar Apple"},
+    PizzaPrismatic = {"Violet Corn","Sugar Apple","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Burger
+    BurgerVeryCommon = {"Pepper","Corn","Tomato","Corn","Corn"},
+    BurgerCommon = {"Pepper","Corn","Tomato"},
+    BurgerRare = {"Corn","Pepper","Tomato","Banana","Corn"},
+    BurgerLegendary = {"Corn","Tomato","Pepper","Moon Melon","Corn"},
+    BurgerDivine = {"Pepper","Corn","Tomato","Bone Blossom","Bone Blossom"},
+    BurgerPrismatic = {"Violet Corn","Tomato","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- Cake
+    CakeVeryCommon = {"Corn","Strawberry","Corn","Blueberry","Corn"},
+    CakeCommon = {"Corn","Strawberry","Blueberry","Corn"},
+    CakeRare = {"Corn","Blueberry","Tomato","Corn","Banana"},
+    CakeLegendary = {"Kiwi","Banana","Apple","Corn","Corn"},
+    CakeDivine = {"Sugar Apple","Corn","Banana","Bone Blossom","Bone Blossom"},
+    CakePrismatic = {"Bone Blossom","Bone Blossom","Bone Blossom","Sugar Apple","Banana"},
+
+    -- Sushi
+    SushiVeryCommon = {"Bamboo","Corn","Corn","Bamboo","Corn"},
+    SushiCommon = {"Bamboo","Bamboo","Bamboo","Bamboo","Corn"},
+    SushiRare = {"Bamboo","Corn","Maple Apple","Bamboo","Corn"},
+    SushiLegendary = {"Bamboo","Corn","Maple Apple","Apple","Bamboo"},
+    SushiDivine = {"Bamboo","Corn","Bone Blossom","Bone Blossom","Bone Blossom"},
+    -- Prismatic Sushi is not confirmed in wiki
+}
+
+-- Function to create section with buttons for all rarities
+local function addButtonsForDish(dish, side)
+    local section = E:AddSection(dish, side)
+    for _, rarity in ipairs({"VeryCommon","Common","Rare","Legendary","Divine","Prismatic"}) do
+        section:AddButton(rarity, function()
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+            local Backpack = LocalPlayer.Backpack
+            local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local Remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("CookingPotService_RE")
+
+            local key = dish..rarity
+            local chosen = recipes[key]
+            if not chosen then 
+                warn("No recipe defined for "..key)
+                return 
+            end
+
+            for _, item in ipairs(chosen) do
+                local tool = Backpack:FindFirstChild(item) or Character:FindFirstChild(item)
+                if tool then
+                    if Backpack:FindFirstChild(tool.Name) then
+                        LocalPlayer.Character.Humanoid:EquipTool(tool)
+                    end
+                    Remote:FireServer("SubmitHeldPlant")
+                    task.wait(0.5)
+                else
+                    warn("Missing tool: "..item)
+                end
+            end
+        end)
+    end
+end
+
+-- Create left and right sections
+for _, dish in ipairs(dishesLeft) do
+    addButtonsForDish(dish, "left")
+end
+for _, dish in ipairs(dishesRight) do
+    addButtonsForDish(dish, "right")
+end
 end)
