@@ -518,39 +518,51 @@ local PlantRE = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Plant
 local player = Players.LocalPlayer
 
 local toggles = {}
+local toggleUI = {} -- store the UI references
 local plantingSpeed = 1 -- Default interval
 
--- Listen for the Dropdown changes
+-- Dropdown for speed
 as:AddDropdown('Speed', {'Fast', 'Slow'}, 'Slow', function(val)
     plantingSpeed = (val == 'Fast') and 0.3 or 1
 end)
 
--- Function to get all seeds from inventory
+-- Get all seeds in inventory
 local function getSeedsFromInventory()
     local seeds = {}
-
     local function scan(container)
         for _, tool in ipairs(container:GetChildren()) do
             if tool:IsA("Tool") and string.find(tool.Name:lower(), "seed") then
-                table.insert(seeds, tool.Name)
+                seeds[tool.Name] = true
             end
         end
     end
-
     scan(player.Backpack)
     if player.Character then
         scan(player.Character)
     end
-
     return seeds
 end
 
--- Update toggles dynamically
+-- Refresh toggles (remove duplicates & missing)
 local function refreshToggles()
-    for _, seed in ipairs(getSeedsFromInventory()) do
+    local seeds = getSeedsFromInventory()
+
+    -- Remove toggles for seeds no longer in inventory
+    for seed, _ in pairs(toggles) do
+        if not seeds[seed] then
+            toggles[seed] = nil
+            if toggleUI[seed] then
+                toggleUI[seed]:Remove() -- remove the toggle UI
+                toggleUI[seed] = nil
+            end
+        end
+    end
+
+    -- Add new toggles for seeds found
+    for seed, _ in pairs(seeds) do
         if not toggles[seed] then
             toggles[seed] = false
-            as:AddToggle("Auto Plant - " .. seed, false, function(state)
+            toggleUI[seed] = as:AddToggle("Auto Plant - " .. seed, false, function(state)
                 toggles[seed] = state
                 if state then
                     task.spawn(function()
@@ -569,9 +581,14 @@ local function refreshToggles()
     end
 end
 
--- Refresh toggles every time inventory updates
+-- Connect to inventory updates
 player.Backpack.ChildAdded:Connect(refreshToggles)
 player.Backpack.ChildRemoved:Connect(refreshToggles)
+
+player.CharacterAdded:Connect(function(char)
+    char.ChildAdded:Connect(refreshToggles)
+    char.ChildRemoved:Connect(refreshToggles)
+end)
 
 if player.Character then
     player.Character.ChildAdded:Connect(refreshToggles)
@@ -1365,7 +1382,6 @@ local function addButtonsForDish(dish, side)
                         LocalPlayer.Character.Humanoid:EquipTool(tool)
                     end
                     Remote:FireServer("SubmitHeldPlant")
-                    task.wait(0.5)
                 else
                     warn("Missing tool: "..item)
                 end
