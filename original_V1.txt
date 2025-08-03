@@ -1204,7 +1204,5 @@ glsl:AddToggle("Realistic Particles", false, function(val)
     end
 end)
 
-local Chi = E:AddSection('Auto Submits',"right")
-local zenshop = E:AddSection('Zen Shop',"left")
 local pan = E:AddSection('Cooking Ingredients',"right")
-local kitsune = E:AddSection('Kitsune Chest Farm',"left")
+end)
