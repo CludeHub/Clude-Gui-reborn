@@ -1347,6 +1347,7 @@ local function addButtonsForDish(dish, side)
                     if Backpack:FindFirstChild(tool.Name) then
                         LocalPlayer.Character.Humanoid:EquipTool(tool)
                     end
+                    task.wait(1) -- Wait 1 second after equipping
                     Remote:FireServer("SubmitHeldPlant")
                 else
                     warn("Missing tool: "..item)
@@ -1362,5 +1363,5 @@ for _, dish in ipairs(dishesLeft) do
 end
 for _, dish in ipairs(dishesRight) do
     addButtonsForDish(dish, "right")
-end
+  end
 end)
