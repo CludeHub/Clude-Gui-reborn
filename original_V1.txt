@@ -1210,7 +1210,7 @@ glsl:AddToggle("Realistic Particles", false, function(val)
     end
 end)
 
--- List of dishes split left/right for cleaner UI
+    -- List of dishes split left/right for cleaner UI
 local dishesLeft = {"Soup","Salad","Sandwich","Pie","Waffle","HotDog"}
 local dishesRight = {"IceCream","Donut","Pizza","Burger","Cake","Sushi"}
 
@@ -1374,8 +1374,15 @@ local function addButtonsForDish(dish, side)
                     if Backpack:FindFirstChild(tool.Name) then
                         LocalPlayer.Character.Humanoid:EquipTool(tool)
                     end
-                    task.wait(1) -- Wait 1 second after equip
+
+                    -- Wait until equipped or 1s timeout
+                    local start = tick()
+                    while tool.Parent ~= Character and tick() - start < 1 do
+                        task.wait()
+                    end
+
                     Remote:FireServer("SubmitHeldPlant")
+                    task.wait(1) -- Wait 1 second between ingredients
                 else
                     warn("Missing tool: "..item)
                 end
