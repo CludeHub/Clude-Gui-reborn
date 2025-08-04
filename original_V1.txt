@@ -1308,19 +1308,46 @@ local recipes = {
     -- SushiPrismatic is unconfirmed
 }
 
--- Helper: find tool by partial name
+-- Helper: find the best tool (ignore seeds & pick highest kg)
 local function findTool(partialName, Backpack, Character)
+    local function validTool(tool)
+        return tool:IsA("Tool")
+            and string.find(tool.Name, partialName)
+            and not string.find(tool.Name:lower(), "seed")
+    end
+
+    -- Extract weight from name
+    local function getWeight(toolName)
+        local weight = string.match(toolName, "(%d+%.?%d*)kg")
+        return weight and tonumber(weight) or 0
+    end
+
+    local bestTool = nil
+    local bestWeight = -1
+
+    -- Search in Character
     for _, tool in ipairs(Character:GetChildren()) do
-        if tool:IsA("Tool") and string.find(tool.Name, partialName) then
-            return tool
+        if validTool(tool) then
+            local weight = getWeight(tool.Name)
+            if weight > bestWeight then
+                bestTool = tool
+                bestWeight = weight
+            end
         end
     end
+
+    -- Search in Backpack
     for _, tool in ipairs(Backpack:GetChildren()) do
-        if tool:IsA("Tool") and string.find(tool.Name, partialName) then
-            return tool
+        if validTool(tool) then
+            local weight = getWeight(tool.Name)
+            if weight > bestWeight then
+                bestTool = tool
+                bestWeight = weight
+            end
         end
     end
-    return nil
+
+    return bestTool
 end
 
 -- Function to create section with buttons for all rarities
@@ -1347,7 +1374,7 @@ local function addButtonsForDish(dish, side)
                     if Backpack:FindFirstChild(tool.Name) then
                         LocalPlayer.Character.Humanoid:EquipTool(tool)
                     end
-                    task.wait(1) -- Wait 1 second after equipping
+                    task.wait(1) -- Wait 1 second after equip
                     Remote:FireServer("SubmitHeldPlant")
                 else
                     warn("Missing tool: "..item)
@@ -1363,5 +1390,5 @@ for _, dish in ipairs(dishesLeft) do
 end
 for _, dish in ipairs(dishesRight) do
     addButtonsForDish(dish, "right")
-  end
+end
 end)
