@@ -22,7 +22,9 @@ local E = Window:AddTab('Event','shop')
 local P = Window:AddTab('Player','user')
 local Cos = Window:AddTab('Cosmetics','cosmetics')
 local egg = Window:AddTab('Pet Eggs','egg')
+local Sprinkler = Window:AddTab('Sprinkler','sprinkler')
 local G = Window:AddTab('Config','gear')
+
 local glsl = G:AddSection('Shader',"left")
 
 local pet = egg:AddSection('Auto Buy',"left")
@@ -54,6 +56,82 @@ e:Hide()
 t:Hide()
 ev:Hide()
 sum:Hide()
+
+local rights = Sprinkler:AddSection('Start',"right")
+local lefts = Sprinkler:AddSection('Option',"left")
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local SprinklerEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("SprinklerService")
+local LocalPlayer = Players.LocalPlayer
+
+-- Position option
+local selectedPosition = "Player"
+
+-- Sprinkler types and settings
+local sprinklerSettings = {
+    ["Basic Sprinkler"] = {enabled = false, amount = 1},
+    ["Advance Sprinkler"] = {enabled = false, amount = 1},
+    ["Godly Sprinkler"] = {enabled = false, amount = 1},
+    ["Master Sprinkler"] = {enabled = false, amount = 1},
+    ["Grandmaster Sprinkler"] = {enabled = false, amount = 1}
+}
+
+-- Setup toggles and dropdowns
+for name, data in pairs(sprinklerSettings) do
+    lefts:AddToggle(name, false, function(val)
+        sprinklerSettings[name].enabled = val
+    end)
+    
+    lefts:AddDropdown('Sprinkler Number', {1,2,3,4,5,6,7,8,9,10}, data.amount, function(val)
+        sprinklerSettings[name].amount = val
+    end)
+end
+
+-- Position dropdown
+rights:AddDropdown('Position', {"Player"}, "Player", function(val)
+    selectedPosition = val
+end)
+
+-- Start Method Button
+rights:AddButton("Start Method", function()
+    print("Start Method Pressed")
+
+    local backpack = LocalPlayer:FindFirstChild("Backpack")
+    local character = LocalPlayer.Character
+    if not backpack or not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    local baseCFrame = character.HumanoidRootPart.CFrame
+
+    for sprinklerName, data in pairs(sprinklerSettings) do
+        if data.enabled then
+            for _, tool in pairs(backpack:GetChildren()) do
+                if tool:IsA("Tool") and tool.Name:lower():find(sprinklerName:lower()) then
+                    LocalPlayer.Character.Humanoid:EquipTool(tool)
+                    
+                    for i = 1, data.amount do
+                        local cframeToUse
+                        if selectedPosition == "Player" then
+                            cframeToUse = character.HumanoidRootPart.CFrame
+                        else
+                            -- fallback static CFrame if needed in future
+                            cframeToUse = CFrame.new(49.9373779296875, 0.13552704453468323, -92.65966796875)
+                        end
+
+                        local args = {
+                            "Create",
+                            cframeToUse
+                        }
+
+                        SprinklerEvent:FireServer(unpack(args))
+                        task.wait(0.2)
+                    end
+                    break
+                end
+            end
+        end
+    end
+end)
 
 var:AddButton("Set all to rainbow", function()
 for _, v in ipairs(game:GetDescendants()) do
