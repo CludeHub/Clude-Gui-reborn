@@ -1027,7 +1027,6 @@ g:AddButton("Buy All Gear", function()
     BuyGearEvent:FireServer("Cleaning Spray")
     BuyGearEvent:FireServer("Favorite Tool")
     BuyGearEvent:FireServer("Friendship Pot")
-    BuyGearEvent:FireServer("Tanning Mirror")
     BuyGearEvent:FireServer("Magnifying Glass")
     BuyGearEvent:FireServer("Harvest Tool")
     BuyGearEvent:FireServer("Medium Toy")
@@ -1052,7 +1051,6 @@ local gearNames = {
     "Favorite Tool",
     "Friendship Pot",
     "Harvest Tool",
-    "Tanning Mirror",
     "Magnifying Glass",
     "Medium Toy",
     "Medium Treat",
