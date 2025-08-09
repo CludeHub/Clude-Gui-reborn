@@ -1286,9 +1286,9 @@ glsl:AddToggle("Realistic Particles", false, function(val)
     end
 end)
 
-    -- List of dishes split left/right for cleaner UI
-local dishesLeft = {"Soup","Salad","Sandwich","Pie","Waffle","HotDog"}
-local dishesRight = {"IceCream","Donut","Pizza","Burger","Cake","Sushi"}
+-- List of dishes split left/right for cleaner UI
+local dishesLeft = {"Soup","Salad","Sandwich","Pie","Waffle","HotDog","Porridge","CandyApple"}
+local dishesRight = {"IceCream","Donut","Pizza","Burger","Cake","Sushi","SweetTea","JandelSalad"}
 
 -- All recipe data table
 local recipes = {
@@ -1302,6 +1302,7 @@ local recipes = {
     SaladLegendary = {"Blood Banana","Blood Banana","Tomato","Tomato","Corn"},
     SaladDivine = {"Tomato","Giant Pinecone","Bone Blossom","Bone Blossom","Bone Blossom"},
     SaladPrismatic = {"Tomato","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+    SaladTranscendent = {"Grand Tomato","Bone Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
 
     -- Sandwich
     SandwichVeryCommon = {"Tomato","Tomato","Corn","Corn","Corn"},
@@ -1381,7 +1382,19 @@ local recipes = {
     SushiRare = {"Bamboo","Corn","Maple Apple","Bamboo","Corn"},
     SushiLegendary = {"Bamboo","Corn","Maple Apple","Apple","Bamboo"},
     SushiDivine = {"Bamboo","Corn","Bone Blossom","Bone Blossom","Bone Blossom"},
-    -- SushiPrismatic is unconfirmed
+
+    -- NEW: Sweet Tea
+    SweetTeaTranscendent = {"Candy Blossom","Candy Blossom","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- NEW: Jandel Salad (unverified)
+    JandelSaladTranscendent = {"Bone Blossom","Bone Blossom","Mega Mushroom","Lemon"},
+
+    -- NEW: Porridge
+    PorridgeLegendary = {"Corn","Corn","Sugar Apple"},
+    PorridgePrismatic = {"Corn","Sugar Apple","Bone Blossom","Bone Blossom","Bone Blossom"},
+
+    -- NEW: Candy Apple
+    CandyAppleDivine = {"Sugar Apple","Sugarglaze"},
 }
 
 -- Helper: find the best tool (ignore seeds & pick highest kg)
@@ -1391,87 +1404,68 @@ local function findTool(partialName, Backpack, Character)
             and string.find(tool.Name, partialName)
             and not string.find(tool.Name:lower(), "seed")
     end
-
-    -- Extract weight from name
     local function getWeight(toolName)
         local weight = string.match(toolName, "(%d+%.?%d*)kg")
         return weight and tonumber(weight) or 0
     end
-
-    local bestTool = nil
-    local bestWeight = -1
-
-    -- Search in Character
+    local bestTool,bestWeight=nil,-1
     for _, tool in ipairs(Character:GetChildren()) do
         if validTool(tool) then
-            local weight = getWeight(tool.Name)
-            if weight > bestWeight then
-                bestTool = tool
-                bestWeight = weight
-            end
+            local weight=getWeight(tool.Name)
+            if weight>bestWeight then bestTool=tool;bestWeight=weight end
         end
     end
-
-    -- Search in Backpack
     for _, tool in ipairs(Backpack:GetChildren()) do
         if validTool(tool) then
-            local weight = getWeight(tool.Name)
-            if weight > bestWeight then
-                bestTool = tool
-                bestWeight = weight
-            end
+            local weight=getWeight(tool.Name)
+            if weight>bestWeight then bestTool=tool;bestWeight=weight end
         end
     end
-
     return bestTool
 end
 
--- Function to create section with buttons for all rarities
-local function addButtonsForDish(dish, side)
-    local section = E:AddSection(dish, side)
-    for _, rarity in ipairs({"VeryCommon","Common","Rare","Legendary","Divine","Prismatic"}) do
-        section:AddButton(rarity, function()
-            local Players = game:GetService("Players")
-            local LocalPlayer = Players.LocalPlayer
-            local Backpack = LocalPlayer.Backpack
-            local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-            local Remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("CookingPotService_RE")
-
-            local key = dish..rarity
-            local chosen = recipes[key]
-            if not chosen then 
-                warn("No recipe defined for "..key)
-                return 
+-- Run recipe
+local function runRecipe(key)
+    local Players=game:GetService("Players")
+    local LocalPlayer=Players.LocalPlayer
+    local Backpack=LocalPlayer.Backpack
+    local Character=LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Remote=game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("CookingPotService_RE")
+    local chosen=recipes[key]
+    if not chosen then warn("No recipe for "..key) return end
+    for _, item in ipairs(chosen) do
+        local tool=findTool(item,Backpack,Character)
+        if tool then
+            if Backpack:FindFirstChild(tool.Name) then
+                LocalPlayer.Character.Humanoid:EquipTool(tool)
             end
-
-            for _, item in ipairs(chosen) do
-                local tool = findTool(item, Backpack, Character)
-                if tool then
-                    if Backpack:FindFirstChild(tool.Name) then
-                        LocalPlayer.Character.Humanoid:EquipTool(tool)
-                    end
-
-                    -- Wait until equipped or 1s timeout
-                    local start = tick()
-                    while tool.Parent ~= Character and tick() - start < 1 do
-                        task.wait()
-                    end
-
-                    Remote:FireServer("SubmitHeldPlant")
-                    task.wait(1) -- Wait 1 second between ingredients
-                else
-                    warn("Missing tool: "..item)
-                end
-            end
-        end)
+            local start=tick()
+            while tool.Parent~=Character and tick()-start<1 do task.wait() end
+            Remote:FireServer("SubmitHeldPlant")
+            task.wait(1)
+        else
+            warn("Missing tool: "..item)
+        end
     end
 end
 
--- Create left and right sections
+-- Function to create section with buttons
+local function addButtonsForDish(dish, side)
+    local section=E:AddSection(dish, side)
+    for _, rarity in ipairs({"VeryCommon","Common","Rare","Legendary","Divine","Prismatic","Transcendent"}) do
+        local key=dish..rarity
+        if recipes[key] then
+            section:AddButton(rarity,function()
+                runRecipe(key)
+            end)
+        end
+    end
+end
+
+-- Create sections
 for _, dish in ipairs(dishesLeft) do
     addButtonsForDish(dish, "left")
 end
 for _, dish in ipairs(dishesRight) do
     addButtonsForDish(dish, "right")
 end
-end)
