@@ -1305,7 +1305,7 @@ local items = {
 
 -- make a toggle for each
 for _, itemName in ipairs(items) do
-    beanAddToggle(itemName, false, function(val)
+    bean:AddToggle(itemName, false, function(val)
         if val then
             BuyEvent:FireServer(itemName)
             print("Bought:", itemName)
