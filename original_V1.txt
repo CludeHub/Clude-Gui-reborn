@@ -1287,6 +1287,27 @@ glsl:AddToggle("Realistic Particles", false, function(val)
 end)
 
 local bean = E:AddSection('Shop',"left")
+local beanauto = E:AddSection('Auto',"right")
+
+local autoFeed = false
+
+beanauto:AddToggle('Auto feed beanstalk', false, function(state)
+    autoFeed = state  -- update toggle state
+    if autoFeed then
+        spawn(function()  -- run loop in a separate thread
+            while autoFeed do
+                local success, err = pcall(function()
+                    game:GetService("ReplicatedStorage"):WaitForChild("GameEvents")
+                        :WaitForChild("BeanstalkRESubmitAllPlant"):FireServer()
+                end)
+                if not success then
+                    warn("Error feeding beanstalk: "..err)
+                end
+                wait(1) -- wait 1 second between feeds to prevent flooding
+            end
+        end)
+    end
+end)
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local BuyEvent = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("BuyEventShopStock")
