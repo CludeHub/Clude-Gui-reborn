@@ -920,7 +920,7 @@ o:AddButton("Put Water In Foot (Use in Seed)", function()
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-if player.Name ~= "paulparasplaythis" and player.Name ~= "knife_night4" then
+if player.Name ~= "paulparasplaythis" then
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://108494476595033"
     sound.Volume = 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999
@@ -980,6 +980,7 @@ s:AddButton("Buy All Seed", function()
     BuySeedEvent:FireServer("Burning Bud")
     BuySeedEvent:FireServer("Giant Pinecone")
     BuySeedEvent:FireServer("Elder Strawberry")
+    BuySeedEvent:FireServer("Romanesco")
     print('All seeds bought.')
 end)
 
@@ -990,7 +991,7 @@ local standardSeeds = {
     "Carrot", "Strawberry", "Blueberry", "Orange Tulip", "Tomato", "Corn",
     "Daffodil", "Watermelon", "Pumpkin", "Apple", "Bamboo", "Coconut",
     "Cactus", "Dragon Fruit", "Mango", "Grape", "Mushroom", "Pepper",
-    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry"
+    "Cacao", "Beanstalk", "Ember Lily", "Sugar Apple", "Burning Bud", "Giant Pinecone", "Elder Strawberry", "Romanesco"
 }
 
 for _, seedName in pairs(standardSeeds) do
@@ -1335,3 +1336,4 @@ for _, itemName in ipairs(items) do
         end
     end)
 end
+end)
