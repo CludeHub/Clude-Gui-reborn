@@ -6,7 +6,7 @@ local Loader = loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeH
 
 local paid
 
-if name == "knife_night4" or name == "knife_night9" then
+if name == "Knife_night4" or name == "Knife_night9" then
     paid = false
 else
     paid = true
@@ -261,10 +261,10 @@ local BuyPetEgg = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Buy
 local Toggles = {}
 local Eggs = {
     "Common Egg",
-    "Common Summer Egg",
-    "Rare Summer Egg",
+    "Uncommon Egg",
+    "Rare Egg",
     "Mythical Egg",
-    "Paradise Egg",
+    "Legendary Egg",
     "Bug Egg"
 }
 
