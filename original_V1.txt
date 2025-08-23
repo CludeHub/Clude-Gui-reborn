@@ -23,7 +23,7 @@ local P = Window:AddTab('Player','user')
 local Cos = Window:AddTab('Cosmetics','cosmetics')
 local egg = Window:AddTab('Pet Eggs','egg')
 local Sprinkler = Window:AddTab('Sprinkler','sprinkler')
-local G = Window:AddTab('Config','gear')
+local G = Window:AddTab('Misc','gear')
 
 local glsl = G:AddSection('Shader',"left")
 
@@ -59,6 +59,50 @@ sum:Hide()
 
 local rights = Sprinkler:AddSection('Start',"right")
 local lefts = Sprinkler:AddSection('Option',"left")
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local radius = 1
+local speed = 0
+local orbiting = false
+local connection
+
+glsl:AddToggle('Auto Middle Pet', false, function(val)
+    orbiting = val
+
+    if orbiting then
+        local petsFolder = workspace:WaitForChild("PetsPhysical")
+        local petMovers = {}
+        for _, v in ipairs(petsFolder:GetDescendants()) do
+            if v:IsA("BasePart") and v.Name == "PetMover" then
+                table.insert(petMovers, v)
+            end
+        end
+
+        local angleOffset = 2 * math.pi / #petMovers
+        connection = RunService.RenderStepped:Connect(function()
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+
+            for i, pet in ipairs(petMovers) do
+                if pet and pet.Parent then
+                    local angle = tick() * speed + (i * angleOffset)
+                    local x = math.cos(angle) * radius
+                    local z = math.sin(angle) * radius
+                    pet.CFrame = CFrame.new(hrp.Position + Vector3.new(x, 2, z))
+                end
+            end
+        end)
+    else
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+    end
+end)
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
