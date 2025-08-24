@@ -10,9 +10,8 @@ if name == "Knife_night4" or name == "Knife_night9" then
     paid = false
 else
     paid = true
-    Loader:Function(true, "https://www.roblox.com/game-pass/1233310627/NEVERLOSE-CC-LOADER", 1233310627, function()
-    game.Players.LocalPlayer:Kick("Sorry the auto middle script are still being repaired comeback here tommorow")
---[[
+    Loader:Load(true, "https://www.roblox.com/game-pass/1233310627/NEVERLOSE-CC-LOADER", 1233310627, function()
+
 local TextHub = "CludeHub"
 local Text = "GROW A GARDEN"
 
@@ -1405,4 +1404,3 @@ for _, itemName in ipairs(items) do
 end
 end)
 end
-]]
