@@ -77,7 +77,7 @@ local TradeEvents = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("T
 
 -- function to rebuild buttons
 local function RefreshButtons()
-    Trade:Clear() -- clear all buttons first
+    
     for _, plr in pairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer then
             Trade:AddButton(plr.Name, function()
