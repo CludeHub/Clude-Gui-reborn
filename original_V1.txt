@@ -69,6 +69,44 @@ local rights = Sprinkler:AddSection('Start',"right")
 local lefts = Sprinkler:AddSection('Option',"left")
 
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TradeEvents = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("TradeEvents")
+
+local TradeSection -- will hold the current section
+
+local function RefreshSection()
+    -- hide/remove old section if it exists
+    if TradeSection then
+        TradeSection:Hide()
+    end
+    
+    -- create a new section
+    TradeSection = Tr:AddSection("Players", "left")
+
+    -- add buttons for each player
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
+            TradeSection:AddButton(plr.Name, function()
+                local args = {plr}
+                TradeEvents:WaitForChild("SendRequest"):FireServer(unpack(args))
+                print("Sent trade request to", plr.Name)
+            end)
+        end
+    end
+end
+
+-- initial load
+RefreshSection()
+
+-- auto refresh every 5 sec
+task.spawn(function()
+    while true do
+        task.wait(5)
+        RefreshSection()
+    end
+end)
+
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
