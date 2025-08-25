@@ -15,7 +15,7 @@ else
 local TextHub = "CludeHub"
 local Text = "GROW A GARDEN"
 
-local Window = NEVERLOSE:AddWindow(TextHub,Text,'original')
+local Window = NEVERLOSE:AddWindow(TextHub,Text,'dark')
 Window:AddTabLabel('Home')
 
 local H = Window:AddTab('Home','home')
