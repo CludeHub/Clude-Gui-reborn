@@ -31,7 +31,7 @@ local Cos = Window:AddTab('Cosmetics','cosmetics')
 local egg = Window:AddTab('Pet Eggs','egg')
 local Sprinkler = Window:AddTab('Sprinkler','sprinkler')
 local G = Window:AddTab('Misc','list')
-local Tr = Window:AddTab('Trading','s')
+local Tr = Window:AddTab('Trading','side')
 
 local Trade = Tr:AddSection('Players',"left")
 
