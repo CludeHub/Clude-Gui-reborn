@@ -33,8 +33,6 @@ local Sprinkler = Window:AddTab('Sprinkler','sprinkler')
 local G = Window:AddTab('Misc','list')
 local Tr = Window:AddTab('Trading','side')
 
-local Trade = Tr:AddSection('Players',"left")
-
 local glsl = G:AddSection('Shader',"left")
 
 local pet = egg:AddSection('Auto Buy',"left")
@@ -69,32 +67,6 @@ sum:Hide()
 
 local rights = Sprinkler:AddSection('Start',"right")
 local lefts = Sprinkler:AddSection('Option',"left")
-
-
--- make all player buttons once
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TradeEvents = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("TradeEvents")
-
-for _, plr in pairs(Players:GetPlayers()) do
-    if plr ~= Players.LocalPlayer then
-        Trade:AddButton(plr.Name, function()
-            local args = {plr}
-            TradeEvents:WaitForChild("SendRequest"):FireServer(unpack(args))
-            print("Sent trade request to", plr.Name)
-        end)
-    end
-end
-
--- auto refresh by hide → show loop
-task.spawn(function()
-    while true do
-        task.wait(5) -- refresh interval
-        Trade:Hide()
-        task.wait(0.1)
-        Trade:Show()
-    end
-end)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
