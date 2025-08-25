@@ -70,6 +70,44 @@ local lefts = Sprinkler:AddSection('Option',"left")
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PetGiftingService = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("PetGiftingService")
+
+local GiftSection -- will hold the current section
+
+local function RefreshSection()
+    -- remove old section if it exists
+    if GiftSection then
+        GiftSection:Hide()
+    end
+    
+    -- create a new section
+    GiftSection = Tr:AddSection("Players", "right")
+
+    -- add buttons for each player
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
+            GiftSection:AddButton(plr.Name, function()
+                local args = {"GivePet", plr}
+                PetGiftingService:FireServer(unpack(args))
+                print("Gave pet to", plr.Name)
+            end)
+        end
+    end
+end
+
+-- initial load
+RefreshSection()
+
+-- auto refresh every 5 sec
+task.spawn(function()
+    while true do
+        task.wait(5)
+        RefreshSection()
+    end
+end)
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TradeEvents = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("TradeEvents")
 
 local TradeSection -- will hold the current section
