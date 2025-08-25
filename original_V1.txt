@@ -30,7 +30,10 @@ local P = Window:AddTab('Player','user')
 local Cos = Window:AddTab('Cosmetics','cosmetics')
 local egg = Window:AddTab('Pet Eggs','egg')
 local Sprinkler = Window:AddTab('Sprinkler','sprinkler')
-local G = Window:AddTab('Misc','gear')
+local G = Window:AddTab('Misc','s')
+local Tr = Window:AddTab('Trading','list')
+
+local Trade = Tr:AddSection('Players',"left")
 
 local glsl = G:AddSection('Shader',"left")
 
@@ -66,6 +69,40 @@ sum:Hide()
 
 local rights = Sprinkler:AddSection('Start',"right")
 local lefts = Sprinkler:AddSection('Option',"left")
+
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TradeEvents = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("TradeEvents")
+
+-- function to rebuild buttons
+local function RefreshButtons()
+    Trade:Clear() -- clear all buttons first
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
+            Trade:AddButton(plr.Name, function()
+                local args = {plr}
+                TradeEvents:WaitForChild("SendRequest"):FireServer(unpack(args))
+                print("Sent trade request to", plr.Name)
+            end)
+        end
+    end
+end
+
+-- initial load
+RefreshButtons()
+
+-- auto refresh every 5 seconds
+task.spawn(function()
+    while true do
+        RefreshButtons()
+        task.wait(5) -- adjust time if needed
+    end
+end)
+
+-- also refresh when someone joins/leaves (instant update)
+Players.PlayerAdded:Connect(RefreshButtons)
+Players.PlayerRemoving:Connect(RefreshButtons)
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
