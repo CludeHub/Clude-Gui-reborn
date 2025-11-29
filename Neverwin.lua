@@ -21,6 +21,308 @@ local Scripts = Window:AddTab("Scripts","code")
 
 
 
+do
+
+local gameService = game
+local workspaceService = workspace
+local players = game:GetService("Players")
+
+local localPlayer = players.LocalPlayer
+local cam = workspaceService.CurrentCamera
+
+-- Aimbot prediction constants
+local bulletSpeed = 3000
+local gravity = 196.2
+local maxRange = 1500
+local accuracy = 0
+local predictionMultiplier = 1
+
+-- Teleport spin vars
+local spinAngle = 0
+local radius = 7
+local speed = 10
+
+-- Settings
+local settings = {
+    INSTANT_TP = true,
+    FLOAT_HEIGHT = 1,
+    BACK_DISTANCE = 1,
+    AIMBOT_ACTIVE = true,
+    UPDATE_RATE = 0.001,
+    BYPASS_PHYSICS = true,
+    NOCLIP_ENABLED = true,
+    AIMBOT_PART = "Head"
+}
+
+-- Noclip Module
+local noclip = {}
+
+function noclip:enable_noclip(char)
+    if not char then return end
+    for _, part in ipairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+
+    char.ChildAdded:Connect(function(child)
+        if child:IsA("BasePart") then
+            child.CanCollide = false
+        end
+    end)
+end
+
+-- Disable world collisions
+function noclip:disable_world_collision()
+    local function disable(part)
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+
+    workspaceService.ChildAdded:Connect(function(child)
+        disable(child)
+    end)
+
+    for _, part in ipairs(workspaceService:GetChildren()) do
+        disable(part)
+    end
+end
+
+
+-- Kill physics module
+local physics = {}
+
+function physics:kill_character_physics(char)
+    if not char then return end
+
+    for _, part in ipairs(char:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+            part.Velocity = Vector3.new(0,0,0)
+            part.RotVelocity = Vector3.new(0,0,0)
+        end
+    end
+
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.PlatformStand = true
+        hum.AutoRotate = false
+        hum.JumpPower = 0
+        hum.WalkSpeed = 0
+    end
+end
+
+-- Enemy finder
+local enemy = {}
+
+function enemy:get_enemies()
+    local list = {}
+    local myChar = localPlayer.Character
+    if not myChar then return list end
+
+    local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+    if not myRoot then return list end
+
+    for _, plr in ipairs(players:GetPlayers()) do
+        if plr ~= localPlayer and plr.Character then
+            -- Team check
+            local alive = true
+            if localPlayer.Team and plr.Team then
+                if localPlayer.Team == plr.Team then
+                    alive = false
+                end
+            end
+
+            if alive then
+                local root = plr.Character:FindFirstChild("HumanoidRootPart")
+                local hum = plr.Character:FindFirstChildOfClass("Humanoid")
+                local head = plr.Character:FindFirstChild("Head")
+                local vel = root and root.AssemblyLinearVelocity or Vector3.new(0,0,0)
+
+                if root and hum and head and hum.Health > 0 then
+                    table.insert(list, {
+                        player = plr,
+                        root = root,
+                        head = head,
+                        humanoid = hum,
+                        velocity = vel,
+                        distance = (myRoot.Position - root.Position).Magnitude
+                    })
+                end
+            end
+        end
+    end
+
+    table.sort(list, function(a,b) return a.distance < b.distance end)
+    return list
+end
+
+-- Instant TP
+function enemy:instant_teleport(pos)
+    if not pos then return false end
+
+    local char = localPlayer.Character
+    if not char then return false end
+
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return false end
+
+    root.CFrame = CFrame.new(pos)
+    root.Velocity = Vector3.new(0,0,0)
+    root.RotVelocity = Vector3.new(0,0,0)
+
+    return true
+end
+
+
+-- Prediction module
+local aim = {}
+
+function aim:predict(startPos, targetPos, targetVel, speed, grav)
+    local iterations = 20
+    local time = (targetPos - startPos).Magnitude / speed
+    local result = targetPos
+
+    for i = 1, iterations do
+        local predicted = targetPos + targetVel * time
+        local drop = 0.5 * grav * time^2
+        predicted = predicted - Vector3.new(0, drop, 0)
+
+        local newTime = (predicted - startPos).Magnitude / speed
+        if math.abs(newTime - time) < 0.001 then
+            result = predicted
+            break
+        end
+
+        time = newTime
+        result = predicted
+    end
+
+    return result
+end
+
+function aim:get_target_part(enemyData)
+    if settings.AIMBOT_PART == "Head" then
+        return enemyData.head
+    else
+        return enemyData.root
+    end
+end
+
+function aim:update()
+    if not settings.AIMBOT_ACTIVE then return end
+    local char = localPlayer.Character
+    if not char then return end
+
+    local enemies = enemy:get_enemies()
+    if #enemies == 0 then return end
+
+    local targetData = enemies[1]
+    local targetPart = aim:get_target_part(targetData)
+
+    local myRoot = char:FindFirstChild("HumanoidRootPart")
+    if not targetPart or not myRoot then return end
+
+    if targetData.humanoid.Health <= 0 then return end
+    if targetData.distance > maxRange then return end
+
+    local shooterPos = cam.CFrame.Position
+    local targetPos = targetPart.Position
+
+    local predicted = aim:predict(shooterPos, targetPos, targetData.velocity, bulletSpeed, gravity)
+
+    -- small right offset
+    local offset = cam.CFrame.RightVector * (predictionMultiplier * accuracy)
+    predicted += offset
+
+    cam.CFrame = CFrame.new(shooterPos, predicted)
+end
+
+
+-- Updating loops
+local aimbotConnection = nil
+local tpLoop = nil
+
+local function startAimbot()
+    if aimbotConnection then return end
+    aimbotConnection = game:GetService("RunService").Stepped:Connect(function()
+        if settings.AIMBOT_ACTIVE then
+            aim:update()
+        end
+    end)
+end
+
+local function stopAimbot()
+    if aimbotConnection then
+        aimbotConnection:Disconnect()
+        aimbotConnection = nil
+    end
+end
+
+local function startTP()
+    if tpLoop then return end
+    startAimbot()
+
+    tpLoop = task.spawn(function()
+        while task.wait(settings.UPDATE_RATE) do
+            if not tpLoop then break end
+
+            local enemies = enemy:get_enemies()
+            if #enemies > 0 then
+                local data = enemies[1]
+                local root = data.root
+
+                if root and data.humanoid.Health > 0 then
+                    spinAngle += settings.UPDATE_RATE * speed
+
+                    local x = root.Position.X
+                    local y = root.Position.Y + settings.FLOAT_HEIGHT
+                    local z = root.Position.Z
+
+                    local orbitX = x + radius * math.cos(spinAngle)
+                    local orbitZ = z + radius * math.sin(spinAngle)
+
+                    enemy:instant_teleport(Vector3.new(orbitX, y, orbitZ))
+                end
+            end
+        end
+    end)
+end
+
+local function stopTP()
+    stopAimbot()
+    tpLoop = nil
+end
+
+
+-- Character setup
+local function setupChar(char)
+    task.wait(1)
+    local root = char:FindFirstChild("HumanoidRootPart")
+    local hum = char:FindFirstChild("Humanoid")
+
+    if root and hum then
+        physics:kill_character_physics(char)
+        noclip:enable_noclip(char)
+
+        hum.PlatformStand = true
+        hum.AutoRotate = false
+    end
+end
+
+local function init()
+    noclip:disable_world_collision()
+
+    if localPlayer.Character then
+        setupChar(localPlayer.Character)
+    end
+
+    localPlayer.CharacterAdded:Connect(setupChar)
+end
+
+init()
+
 
 
 
@@ -140,6 +442,22 @@ local wb = Legitbot:AddSection('Wall Bang',"right")
 
 -- General
 g:AddToggle('Enable', false, function(val) AimbotEnabled = val end)
+
+
+local enabled = false
+
+g:AddToggle("Kill all", false, function(val)
+enabled = not enabled
+
+    if enabled then
+        
+        startTP()
+    else
+        
+        stopTP()
+    end
+
+end)
 
 g:AddToggle('Draw FOV', false, function(val) DrawFOV = val end)
 g:AddDropdown('Before shot delay', {"None", "Combined", "On shot"}, "None", function(val) BeforeShotDelay = val end)
@@ -305,7 +623,145 @@ RunService.RenderStepped:Connect(updateCrosshair)
 wb:AddToggle("Penetration crosshair", false, function(val)
     crosshairEnabled = val
 end)
+end
 
+do
+local recoil = Legitbot:AddSection("Exploit","right")
+
+local g = recoil
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local originalSpreads = {}
+local norecoil = false
+local spreads = 0
+
+g:AddToggle("No recoil", false, function(state)
+    norecoil = state
+
+    for _, weapon in pairs(ReplicatedStorage.Weapons:GetChildren()) do
+        local spread = weapon:FindFirstChild("Spread")
+        if spread then
+
+            if state then
+                -- Save original values once
+                if not originalSpreads[weapon.Name] then
+                    originalSpreads[weapon.Name] = {
+                        SpreadValue = spread.Value,
+                        Children = {}
+                    }
+
+                    for _, v in pairs(spread:GetChildren()) do
+                        originalSpreads[weapon.Name].Children[v.Name] = v.Value
+                    end
+                end
+
+                -- Apply modified spread
+                spread.Value = spreads
+                for _, v in pairs(spread:GetChildren()) do
+                    v.Value = 0
+                end
+
+            else
+                -- Restore original values
+                local data = originalSpreads[weapon.Name]
+                if data then
+                    spread.Value = data.SpreadValue
+                    for _, v in pairs(spread:GetChildren()) do
+                        if data.Children[v.Name] then
+                            v.Value = data.Children[v.Name]
+                        end
+                    end
+                end
+            end
+        end
+    end
+end)
+
+
+-- SLIDER
+g:AddSlider("Spread", 0, 73.4, 73.4, function(val)
+    spreads = val
+
+    -- If recoil is ON, apply instantly
+    if norecoil then
+        for _, weapon in pairs(ReplicatedStorage.Weapons:GetChildren()) do
+            local spread = weapon:FindFirstChild("Spread")
+            if spread then
+                spread.Value = spreads
+                for _, v in pairs(spread:GetChildren()) do
+                    v.Value = 0
+                end
+            end
+        end
+    end
+end)
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local originalAmmo = {}
+local infiniteAmmo = false
+
+g:AddToggle("Infinite Ammo", false, function(state)
+    infiniteAmmo = state
+
+    for _, weapon in pairs(ReplicatedStorage.Weapons:GetChildren()) do
+        if weapon:FindFirstChild("Ammo") then
+            if state then
+                -- Save original ammo if not already saved
+                if not originalAmmo[weapon.Name] then
+                    originalAmmo[weapon.Name] = weapon.Ammo.Value
+                end
+                weapon.Ammo.Value = 99999999
+            else
+                -- Restore original ammo
+                if originalAmmo[weapon.Name] then
+                    weapon.Ammo.Value = originalAmmo[weapon.Name]
+                end
+            end
+        end
+    end
+end)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local originalFireRates = {}
+local noFireRate = false
+
+g:AddToggle("No FireRate", false, function(state)
+    noFireRate = state
+
+    for _, weapon in pairs(ReplicatedStorage.Weapons:GetChildren()) do
+        if weapon:FindFirstChild("FireRate") then
+            if state then
+                -- Save original FireRate if not already saved
+                if not originalFireRates[weapon.Name] then
+                    originalFireRates[weapon.Name] = weapon.FireRate.Value
+                end
+                weapon.FireRate.Value = 0
+            else
+                -- Restore original FireRate
+                if originalFireRates[weapon.Name] then
+                    weapon.FireRate.Value = originalFireRates[weapon.Name]
+                end
+            end
+        end
+    end
+end)
+
+g:AddSlider("Weapon Bullets", 1,50, 1, function(val)
+    local weapons = game:GetService("ReplicatedStorage").Weapons
+
+    for _, weapon in pairs(weapons:GetChildren()) do
+        if weapon:FindFirstChild("Bullets") then
+            weapon.Bullets.Value = val
+        end
+    end
+end)
+
+end
+do
 local Fl = Legitbot:AddSection("Flick", "left")
 
 local a = game:GetService("Workspace")
@@ -1575,7 +2031,6 @@ snd:AddSlider("Fake Ping", 0, 300, 50, function(val)
     getgenv().FakePingValue = val
 end)
 
-
 local script = Scripts:AddSection("Activation","left")
 
 script:AddButton("Activate", function()
@@ -1701,11 +2156,12 @@ end)
 
 end
 
--- Example usage:
 AddScript("Best legit config", "11/27/25", UDim2.new(0.02,0,0.01,0), function()
-
+noFireRate = false
+infiniteAmmo = true
+ norecoil = true
 -- Aimbot / Legitbot
-AimbotEnabled = true
+AimbotEnabled = fse
 DrawFOV = false
 Smooth = 9
 Amount = 30
@@ -1718,7 +2174,7 @@ BodyIfLethal = true
 BeforeShotDelay = "None"
 
 -- Wallbang Assist
-t0 = true
+t0 = false
 f0 = 17
 spd = 50
 tm = true
@@ -1731,10 +2187,10 @@ crosshairColor = Color3.fromRGB(255, 0, 0)
 -- Flickbot
 flickEnabled = true
 fovCircleEnabled = true
-j = 100  -- Flick FOV
+j = 60  -- Flick FOV
 
 -- ESP
-_G.ESP_Box_Enabled = true
+_G.ESP_Box_Enabled = false
 _G.ESP_Health_Enabled = true
 _G.ESP_Name_Enabled = true
 _G.ESP_TeamCheck = true
@@ -1783,7 +2239,7 @@ Movement = {
 
 -- Auto Strafe
 getgenv().AirStrafeEnabled = true
-getgenv().AirStrafeStrength = 23
+getgenv().AirStrafeStrength = 29
 
 -- Misc / Scripts tab
 getgenv().FakePingValue = 50
@@ -1800,6 +2256,9 @@ end)
 
 -- Additional scripts, stacked below the first
 AddScript("Legit no miss cheat", "11/27/26", UDim2.new(0.02000000700354576,0,0.12,0), function()
+norecoil = true
+noFireRate = false
+infiniteAmmo = true
 
 -- Aimbot / Legitbot
 AimbotEnabled = true
@@ -1897,6 +2356,9 @@ end)
 
 AddScript("Hvh legit", "11/27/27", UDim2.new(0.02000000700354576,0,0.23,0), function()
     -- Aimbot / Legitbot
+infiniteAmmo = true
+noFireRate = true
+ norecoil = true
 AimbotEnabled = true
 DrawFOV = false
 Smooth = 5
@@ -1989,3 +2451,6 @@ RemoveSmoke = true
 RemoveFlashbang = true
 end)
 end)
+
+
+end
