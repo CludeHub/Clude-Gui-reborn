@@ -462,7 +462,7 @@ end)
 local SilentAimConnection
 local OldNameCall
 
-local FOV = 500 -- FOV radius in pixels
+local FOV = 600 -- FOV radius in pixels
 
 g:AddToggle("Silent aim", false, function(val)
     local Players = game:GetService("Players")
@@ -490,13 +490,27 @@ g:AddToggle("Silent aim", false, function(val)
         return OnScreen
     end
 
+    local function IsVisible(Head)
+        local RayOrigin = Camera.CFrame.Position
+        local RayDirection = (Head.Position - RayOrigin).Unit * 600
+        local RaycastParams = RaycastParams.new()
+        RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+        RaycastParams.FilterDescendantsInstances = {LocalPlayer.Character} -- ignore self
+        local Result = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)
+        if Result then
+            return Result.Instance:IsDescendantOf(Head.Parent)
+        end
+        return true -- no obstacle hit, head is visible
+    end
+
     local function GetClosestHeadFromCursor()
         local ClosestDistance = math.huge
         BodyPart = nil
         for _, Player in pairs(Players:GetPlayers()) do
             if Player ~= LocalPlayer and Player.Team ~= LocalPlayer.Team and Player.Character and Player.Character:FindFirstChild("Humanoid") then
+                local Humanoid = Player.Character:FindFirstChild("Humanoid")
                 local Head = Player.Character:FindFirstChild("Head")
-                if Head and IsOnScreen(Head) then
+                if Humanoid and Humanoid.Health > 0 and Head and IsOnScreen(Head) and IsVisible(Head) then
                     local Distance = (WTS(Head) - MousePositionToVector2()).Magnitude
                     if Distance < ClosestDistance and Distance <= FOV then
                         ClosestDistance = Distance
