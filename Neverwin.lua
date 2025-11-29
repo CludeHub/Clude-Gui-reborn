@@ -459,6 +459,76 @@ enabled = not enabled
 
 end)
 
+local SilentAimConnection
+local OldNameCall
+
+local FOV = 500 -- FOV radius in pixels
+
+g:AddToggle("Silent aim", false, function(val)
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local LocalPlayer = Players.LocalPlayer
+    local Camera = workspace.CurrentCamera
+    local Mouse = LocalPlayer:GetMouse()
+    local BodyPart = nil
+
+    local function WTS(Object)
+        local ObjectVector = Camera:WorldToScreenPoint(Object.Position)
+        return Vector2.new(ObjectVector.X, ObjectVector.Y)
+    end
+
+    local function PositionToRay(Origin, Target)
+        return Ray.new(Origin, (Target - Origin).Unit * 600)
+    end
+
+    local function MousePositionToVector2()
+        return Vector2.new(Mouse.X, Mouse.Y)
+    end
+
+    local function IsOnScreen(Object)
+        local OnScreen, _ = Camera:WorldToScreenPoint(Object.Position)
+        return OnScreen
+    end
+
+    local function GetClosestHeadFromCursor()
+        local ClosestDistance = math.huge
+        BodyPart = nil
+        for _, Player in pairs(Players:GetPlayers()) do
+            if Player ~= LocalPlayer and Player.Team ~= LocalPlayer.Team and Player.Character and Player.Character:FindFirstChild("Humanoid") then
+                local Head = Player.Character:FindFirstChild("Head")
+                if Head and IsOnScreen(Head) then
+                    local Distance = (WTS(Head) - MousePositionToVector2()).Magnitude
+                    if Distance < ClosestDistance and Distance <= FOV then
+                        ClosestDistance = Distance
+                        BodyPart = Head
+                    end
+                end
+            end
+        end
+    end
+
+    if val then
+        SilentAimConnection = RunService:BindToRenderStep("Dynamic Silent Aim", 120, GetClosestHeadFromCursor)
+
+        if not OldNameCall then
+            OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)
+                local Method = getnamecallmethod()
+                local Args = {...}
+                if Method == "FindPartOnRayWithIgnoreList" and BodyPart then
+                    Args[1] = PositionToRay(Camera.CFrame.Position, BodyPart.Position)
+                    return OldNameCall(Self, unpack(Args))
+                end
+                return OldNameCall(Self, ...)
+            end)
+        end
+    else
+        if SilentAimConnection then
+            RunService:UnbindFromRenderStep("Dynamic Silent Aim")
+            SilentAimConnection = nil
+        end
+    end
+end)
+
 g:AddToggle('Draw FOV', false, function(val) DrawFOV = val end)
 g:AddDropdown('Before shot delay', {"None", "Combined", "On shot"}, "None", function(val) BeforeShotDelay = val end)
 g:AddSlider('Speed', 1, 20, 1.1, function(val) Smooth = val end)
@@ -729,7 +799,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local originalFireRates = {}
 local noFireRate = false
 
-g:AddToggle("No FireRate", false, function(state)
+g:AddToggle("Rapid fire", false, function(state)
     noFireRate = state
 
     for _, weapon in pairs(ReplicatedStorage.Weapons:GetChildren()) do
@@ -2021,15 +2091,6 @@ snd:AddToggle("Filter Console", false, function(val)
     end
 end)
 
--- Unlock Cvars Toggle
-snd:AddToggle("Unlock Cvars", false, function(val)
-    -- Unlock hidden cvars logic here
-end)
-
--- Fake Ping Slider
-snd:AddSlider("Fake Ping", 0, 300, 50, function(val)
-    getgenv().FakePingValue = val
-end)
 
 local script = Scripts:AddSection("Activation","left")
 
