@@ -23,7 +23,6 @@ Window:AddTabLabel("Visual")
 local Player  = Window:AddTab("Player","user")
 local Weapon  = Window:AddTab("Weapon","gun")
 local World   = Window:AddTab("World","earth")
-local View = Window:AddTab("View","camera")
 
 Window:AddTabLabel("Miscellaneous")
 local Main = Window:AddTab("Main","gear")
@@ -33,7 +32,7 @@ local Scripts = Window:AddTab("Scripts","code")
 
 do
 
-local camera = View:AddSection("Camera","left")
+local camera = Main:AddSection("Camera","left")
 
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local Camera = workspace.CurrentCamera
