@@ -3,6 +3,16 @@ local NEVERLOSE = loadstring(game:HttpGet("https://raw.githubusercontent.com/Clu
 
 local Window = NEVERLOSE:AddWindow("NEVERWIN","NEVERLOSE V2 CHEAT CSGO",'original', UDim2.new(0, 670, 470, 0))
 
+local UserInputService = game:GetService("UserInputService")
+local Frame = game.CoreGui:WaitForChild("NEVERLOSE"):WaitForChild("Frame")
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end -- Ignore if typing in chat or GUI
+    if input.KeyCode == Enum.KeyCode.H then
+        Frame.Visible = not Frame.Visible
+    end
+end)
+
 
 Window:AddTabLabel('Aimbot')
 
@@ -13,7 +23,7 @@ Window:AddTabLabel("Visual")
 local Player  = Window:AddTab("Player","user")
 local Weapon  = Window:AddTab("Weapon","gun")
 local World   = Window:AddTab("World","earth")
-
+local View = Window:AddTab("View","camera")
 
 Window:AddTabLabel("Miscellaneous")
 local Main = Window:AddTab("Main","gear")
@@ -22,6 +32,48 @@ local Scripts = Window:AddTab("Scripts","code")
 
 
 do
+
+local camera = View:AddSection("Camera","left")
+
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+local CAMERA_RANGE = 10 -- default distance
+local REMOVE_HANDS = true
+local Enabled = false
+
+local function ForceThirdPersonCamera()
+    if not Enabled then return end
+
+    local PlayerArms = Camera:FindFirstChild("Arms")
+    
+    if PlayerArms and REMOVE_HANDS then
+        for _, part in ipairs(PlayerArms:GetDescendants()) do
+            if part:IsA("BasePart") or part:IsA("MeshPart") then
+                if part.Name == "StatClock" then 
+                    part:ClearAllChildren()
+                end
+                part.Transparency = 1
+            end
+        end
+    end
+
+    LocalPlayer.CameraMaxZoomDistance = CAMERA_RANGE
+    LocalPlayer.CameraMinZoomDistance = CAMERA_RANGE
+end
+
+RunService.RenderStepped:Connect(ForceThirdPersonCamera)
+
+-- GUI Integration
+camera:AddToggle("Enable thirdperson", false, function(val)
+    Enabled = val
+end)
+
+camera:AddSlider("Distance", 5, 20, CAMERA_RANGE, function(val)
+    CAMERA_RANGE = val
+end)
+
 
 local gameService = game
 local workspaceService = workspace
