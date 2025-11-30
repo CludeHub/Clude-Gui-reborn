@@ -515,7 +515,7 @@ end)
 local SilentAimConnection  
 local OldNameCall  
 
-local FOV = 600
+local FOV = 400
 local silentAim = false  
 
 g:AddToggle("Silent aim", false, function(val)  
