@@ -2,7 +2,7 @@
 
 local NEVERLOSE = loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeHub/SourceCludeLib/refs/heads/main/NerverLoseLibEdited.lua"))()
 
-local Window = NEVERLOSE:AddWindow("NEVERWIN","NEVERLOSE V2 CHEAT CSGO",'original', UDim2.new(0, 670, 470, 0))
+local Window = NEVERLOSE:AddWindow("NEVERWIN","NEVERLOSE V2 CHEAT CSGO",'original')
 
 local UserInputService = game:GetService("UserInputService")
 local Frame = game.CoreGui:WaitForChild("NEVERLOSE"):WaitForChild("Frame")
