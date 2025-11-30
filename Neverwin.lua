@@ -1,4 +1,5 @@
 
+
 local NEVERLOSE = loadstring(game:HttpGet("https://raw.githubusercontent.com/CludeHub/SourceCludeLib/refs/heads/main/NerverLoseLibEdited.lua"))()
 
 local Window = NEVERLOSE:AddWindow("NEVERWIN","NEVERLOSE V2 CHEAT CSGO",'original', UDim2.new(0, 670, 470, 0))
@@ -39,9 +40,10 @@ local Camera = workspace.CurrentCamera
 local RunService = game:GetService("RunService")
 
 local CAMERA_RANGE = 10 -- default distance
-local REMOVE_HANDS = true
 local Enabled = false
 
+
+local REMOVE_HANDS = true
 local function ForceThirdPersonCamera()
     if not Enabled then return end
 
@@ -510,89 +512,101 @@ enabled = not enabled
 
 end)
 
-local SilentAimConnection
-local OldNameCall
+local SilentAimConnection  
+local OldNameCall  
 
-local FOV = 600 -- FOV radius in pixels
+local FOV = 600
+local silentAim = false  
 
-g:AddToggle("Silent aim", false, function(val)
-    local Players = game:GetService("Players")
-    local RunService = game:GetService("RunService")
-    local LocalPlayer = Players.LocalPlayer
-    local Camera = workspace.CurrentCamera
-    local Mouse = LocalPlayer:GetMouse()
-    local BodyPart = nil
+g:AddToggle("Silent aim", false, function(val)  
+    silentAim = val  
+    local Players = game:GetService("Players")  
+    local RunService = game:GetService("RunService")  
+    local LocalPlayer = Players.LocalPlayer  
+    local Camera = workspace.CurrentCamera  
+    local Mouse = LocalPlayer:GetMouse()  
+    local BodyPart = nil  
 
-    local function WTS(Object)
-        local ObjectVector = Camera:WorldToScreenPoint(Object.Position)
-        return Vector2.new(ObjectVector.X, ObjectVector.Y)
-    end
+    local function WTS(Object)  
+        local ObjectVector = Camera:WorldToScreenPoint(Object.Position)  
+        return Vector2.new(ObjectVector.X, ObjectVector.Y)  
+    end  
 
-    local function PositionToRay(Origin, Target)
-        return Ray.new(Origin, (Target - Origin).Unit * 600)
-    end
+    local function PositionToRay(Origin, Target)  
+        return Ray.new(Origin, (Target - Origin).Unit * 600)  
+    end  
 
-    local function MousePositionToVector2()
-        return Vector2.new(Mouse.X, Mouse.Y)
-    end
+    local function MousePositionToVector2()  
+        return Vector2.new(Mouse.X, Mouse.Y)  
+    end  
 
-    local function IsOnScreen(Object)
-        local OnScreen, _ = Camera:WorldToScreenPoint(Object.Position)
-        return OnScreen
-    end
+    local function IsOnScreen(Object)  
+        local OnScreen, _ = Camera:WorldToScreenPoint(Object.Position)  
+        return OnScreen  
+    end  
 
-    local function IsVisible(Head)
-        local RayOrigin = Camera.CFrame.Position
-        local RayDirection = (Head.Position - RayOrigin).Unit * 600
-        local RaycastParams = RaycastParams.new()
-        RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-        RaycastParams.FilterDescendantsInstances = {LocalPlayer.Character} -- ignore self
-        local Result = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)
-        if Result then
-            return Result.Instance:IsDescendantOf(Head.Parent)
-        end
-        return true -- no obstacle hit, head is visible
-    end
+    local function IsVisible(Head)  
+        local RayOrigin = Camera.CFrame.Position  
+        local RayDirection = (Head.Position - RayOrigin).Unit * 600  
+        local RaycastParams = RaycastParams.new()  
+        RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist  
+        RaycastParams.FilterDescendantsInstances = {LocalPlayer.Character}  
 
-    local function GetClosestHeadFromCursor()
-        local ClosestDistance = math.huge
-        BodyPart = nil
-        for _, Player in pairs(Players:GetPlayers()) do
-            if Player ~= LocalPlayer and Player.Team ~= LocalPlayer.Team and Player.Character and Player.Character:FindFirstChild("Humanoid") then
-                local Humanoid = Player.Character:FindFirstChild("Humanoid")
-                local Head = Player.Character:FindFirstChild("Head")
-                if Humanoid and Humanoid.Health > 0 and Head and IsOnScreen(Head) and IsVisible(Head) then
-                    local Distance = (WTS(Head) - MousePositionToVector2()).Magnitude
-                    if Distance < ClosestDistance and Distance <= FOV then
-                        ClosestDistance = Distance
-                        BodyPart = Head
-                    end
-                end
+        local Result = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)  
+        if Result then  
+            local hitPart = Result.Instance
+            local targetPart = workspace.Map.Geometry:GetChildren()[435]
+            if hitPart == targetPart or hitPart.Name == "BreakMetal" or hitPart.Name == "CLIP" then
+                return true -- go through this part
+            else
+                return hitPart:IsDescendantOf(Head.Parent) -- normal visibility
             end
-        end
-    end
+        end  
+        return true  
+    end  
 
-    if val then
-        SilentAimConnection = RunService:BindToRenderStep("Dynamic Silent Aim", 120, GetClosestHeadFromCursor)
+    local function GetClosestHeadFromCursor()  
+        local ClosestDistance = math.huge  
+        BodyPart = nil  
+        for _, Player in pairs(Players:GetPlayers()) do  
+            if Player ~= LocalPlayer and Player.Team ~= LocalPlayer.Team and Player.Character and Player.Character:FindFirstChild("Humanoid") then  
+                local Humanoid = Player.Character:FindFirstChild("Humanoid")  
+                local Head = Player.Character:FindFirstChild("Head")  
+                if Humanoid and Humanoid.Health > 0 and Head and IsOnScreen(Head) and IsVisible(Head) then  
+                    local Distance = (WTS(Head) - MousePositionToVector2()).Magnitude  
+                    if Distance < ClosestDistance and Distance <= FOV then  
+                        ClosestDistance = Distance  
+                        BodyPart = Head  
+                    end  
+                end  
+            end  
+        end  
+    end  
 
-        if not OldNameCall then
-            OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)
-                local Method = getnamecallmethod()
-                local Args = {...}
-                if Method == "FindPartOnRayWithIgnoreList" and BodyPart then
-                    Args[1] = PositionToRay(Camera.CFrame.Position, BodyPart.Position)
-                    return OldNameCall(Self, unpack(Args))
-                end
-                return OldNameCall(Self, ...)
-            end)
-        end
-    else
-        if SilentAimConnection then
-            RunService:UnbindFromRenderStep("Dynamic Silent Aim")
-            SilentAimConnection = nil
-        end
-    end
+    if silentAim then  
+        SilentAimConnection = RunService:BindToRenderStep("Dynamic Silent Aim", 120, GetClosestHeadFromCursor)  
+
+        if not OldNameCall then  
+            OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)  
+                local Method = getnamecallmethod()  
+                local Args = {...}  
+                if Method == "FindPartOnRayWithIgnoreList" and BodyPart then  
+                    local ray = PositionToRay(Camera.CFrame.Position, BodyPart.Position)
+                    -- Only bypass the walls we want
+                    Args[1] = ray
+                    return OldNameCall(Self, unpack(Args))  
+                end  
+                return OldNameCall(Self, ...)  
+            end)  
+        end  
+    else  
+        if SilentAimConnection then  
+            RunService:UnbindFromRenderStep("Dynamic Silent Aim")  
+            SilentAimConnection = nil  
+        end  
+    end  
 end)
+
 
 g:AddToggle('Draw FOV', false, function(val) DrawFOV = val end)
 g:AddDropdown('Before shot delay', {"None", "Combined", "On shot"}, "None", function(val) BeforeShotDelay = val end)
@@ -891,6 +905,15 @@ g:AddSlider("Weapon Bullets", 1,50, 1, function(val)
     for _, weapon in pairs(weapons:GetChildren()) do
         if weapon:FindFirstChild("Bullets") then
             weapon.Bullets.Value = val
+        end
+    end
+end)
+
+g:AddSlider("Damage", 1, 300, 140, function(val)
+    local weaponsFolder = game:GetService("ReplicatedStorage"):WaitForChild("Weapons")
+    for _, weapon in ipairs(weaponsFolder:GetChildren()) do
+        if weapon:FindFirstChild("DMG") then
+            weapon.DMG.Value = val
         end
     end
 end)
@@ -1962,15 +1985,19 @@ wmisc:AddToggle("Remove flashbang", false, function(val)
 end)
 
 local movement = Main:AddSection("Movement","left")
+
+--// SERVICES
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
+--// PLAYER
 local lp = Players.LocalPlayer
 local char = lp.Character or lp.CharacterAdded:Wait()
 local hum = char:WaitForChild("Humanoid")
 local HRP = char:WaitForChild("HumanoidRootPart")
 
+--// MOVEMENT SETTINGS
 local Movement = {
     AutoJump = false,
     CircleStrafe = false,
@@ -1979,135 +2006,89 @@ local Movement = {
     JumpBug = false
 }
 
------------------------------------------------------
--- PC MOVEMENT KEYS
------------------------------------------------------
+--// PC KEYS
 local moveKeys = {W=false, A=false, S=false, D=false}
 
-UserInputService.InputBegan:Connect(function(key)
-    if key.KeyCode == Enum.KeyCode.W then moveKeys.W = true end
-    if key.KeyCode == Enum.KeyCode.A then moveKeys.A = true end
-    if key.KeyCode == Enum.KeyCode.S then moveKeys.S = true end
-    if key.KeyCode == Enum.KeyCode.D then moveKeys.D = true end
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.W then moveKeys.W = true end
+    if input.KeyCode == Enum.KeyCode.A then moveKeys.A = true end
+    if input.KeyCode == Enum.KeyCode.S then moveKeys.S = true end
+    if input.KeyCode == Enum.KeyCode.D then moveKeys.D = true end
 end)
 
-UserInputService.InputEnded:Connect(function(key)
-    if key.KeyCode == Enum.KeyCode.W then moveKeys.W = false end
-    if key.KeyCode == Enum.KeyCode.A then moveKeys.A = false end
-    if key.KeyCode == Enum.KeyCode.S then moveKeys.S = false end
-    if key.KeyCode == Enum.KeyCode.D then moveKeys.D = false end
+UserInputService.InputEnded:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.W then moveKeys.W = false end
+    if input.KeyCode == Enum.KeyCode.A then moveKeys.A = false end
+    if input.KeyCode == Enum.KeyCode.S then moveKeys.S = false end
+    if input.KeyCode == Enum.KeyCode.D then moveKeys.D = false end
 end)
 
------------------------------------------------------
--- MOBILE MOVEMENT (THUMBSTICK)
------------------------------------------------------
--- Roblox mobile thumbstick exposes movement direction via:
--- Humanoid.MoveDirection (vector3)
-
+--// MOBILE CHECK
 local function isMovingMobile()
-    return hum.MoveDirection.Magnitude > 0.1 -- detects thumbstick movement
+    return hum and hum.MoveDirection.Magnitude > 0.1
 end
 
------------------------------------------------------
--- MAIN MOVEMENT LOOP
------------------------------------------------------
-RunService.RenderStepped:Connect(function(dt)
+--// AIR STRAFE GLOBALS
+getgenv().AirStrafeEnabled = false
+getgenv().AirStrafeStrength = 20
 
+--// CHARACTER UPDATE FUNCTION
+local function updateCharacter(newChar)
+    char = newChar
+    hum = char:WaitForChild("Humanoid")
+    HRP = char:WaitForChild("HumanoidRootPart")
+end
+
+lp.CharacterAdded:Connect(function(newChar)
+    updateCharacter(newChar)
+end)
+
+--// MAIN MOVEMENT LOOP
+RunService.RenderStepped:Connect(function()
     if not hum or hum.Health <= 0 then return end
 
-    -----------------------------------------------------
-    -- AUTO JUMP (PC + MOBILE)
-    -----------------------------------------------------
-    if Movement.AutoJump then
-        if hum.FloorMaterial ~= Enum.Material.Air then
-            hum.Jump = true
-        end
+    local onGround = hum:GetState() == Enum.HumanoidStateType.Running or hum:GetState() == Enum.HumanoidStateType.Landed
+    local usingKeyboard = moveKeys.W or moveKeys.A or moveKeys.S or moveKeys.D
+    local usingMobile = isMovingMobile()
+
+    if Movement.AutoJump and onGround then
+        hum.Jump = true
     end
 
-    -----------------------------------------------------
-    -- CIRCLE STRAFE (PC + MOBILE)
-    -----------------------------------------------------
-    if Movement.CircleStrafe then
+    if Movement.CircleStrafe and HRP then
         HRP.CFrame = HRP.CFrame * CFrame.Angles(0, math.rad(3), 0)
         hum:Move(Vector3.new(1,0,0), true)
     end
 
-    -----------------------------------------------------
-    -- QUICK STOP (PC + MOBILE)
-    -----------------------------------------------------
-    if Movement.QuickStop then
-        local usingKeyboard = (moveKeys.W or moveKeys.A or moveKeys.S or moveKeys.D)
-        local usingMobile = isMovingMobile()
-
-        if not usingKeyboard and not usingMobile then
-            hum:Move(Vector3.new(0,0,0), true)
-        end
+    if Movement.QuickStop and not usingKeyboard and not usingMobile then
+        hum:Move(Vector3.new(0,0,0), true)
     end
 
-    -----------------------------------------------------
-    -- EDGE JUMP (PC + MOBILE)
-    -----------------------------------------------------
-    if Movement.EdgeJump then
-        local ray = Ray.new(HRP.Position, Vector3.new(0, -5, 0))
+    if Movement.EdgeJump and HRP then
+        local ray = Ray.new(HRP.Position, Vector3.new(0,-5,0))
         local hit = workspace:FindPartOnRay(ray, char)
-
         if not hit then
             hum.Jump = true
         end
     end
 
-    -----------------------------------------------------
-    -- JUMP BUG (PC + MOBILE)
-    -----------------------------------------------------
-    if Movement.JumpBug then
-        if hum.FloorMaterial ~= Enum.Material.Air then
-            hum.HipHeight = 0
-            task.wait()
-            hum.HipHeight = 0
-            hum.Jump = false
-        end
+    if Movement.JumpBug and onGround then
+        hum.HipHeight = 0
+        task.wait(0.01)
+        hum.HipHeight = 0
+        hum.Jump = false
     end
-
 end)
 
-movement:AddToggle("Auto Jump", false, function(v) Movement.AutoJump = v end)
-
---// GLOBALS
-getgenv().AirStrafeEnabled = false
-getgenv().AirStrafeStrength = 20
-
---// UI
-movement:AddToggle("Auto strafe", false, function(val)
-    getgenv().AirStrafeEnabled = val
-end)
-
-movement:AddSlider("Smoothing", 1, 200, 20, function(val)
-    getgenv().AirStrafeStrength = val
-end)
-
---// SERVICES
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-
---// MAIN LOOP
+--// AIR STRAFE LOOP
 RunService.RenderStepped:Connect(function()
     if not getgenv().AirStrafeEnabled then return end
+    if not hum or hum.Health <= 0 then return end
 
-    local character = LocalPlayer.Character
-    if not character then return end
-
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-    local humanoid = character:FindFirstChild("Humanoid")
-
-    if not rootPart or not humanoid then return end
-
-    -- MUST be in the air
-    if humanoid.FloorMaterial == Enum.Material.Air then
-        local moveDir = humanoid.MoveDirection
-
+    local rootPart = HRP
+    if hum.FloorMaterial == Enum.Material.Air and rootPart then
+        local moveDir = hum.MoveDirection
         if moveDir.Magnitude > 0 then
-            -- YOUR EXACT AIR STRAFE SYSTEM
             rootPart.Velocity = Vector3.new(
                 moveDir.X * getgenv().AirStrafeStrength,
                 rootPart.Velocity.Y,
@@ -2117,10 +2098,36 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-movement:AddToggle("Circle Strafe", false, function(v) Movement.CircleStrafe = v end)
-movement:AddToggle("Quick Stop", false, function(v) Movement.QuickStop = v end)
-movement:AddToggle("Edge Jump", false, function(v) Movement.EdgeJump = v end)
-movement:AddToggle("Jump Bug", false, function(v) Movement.JumpBug = v end)
+--// GUI TOGGLES EXAMPLES
+movement:AddToggle("Auto Jump", false, function(v)
+    Movement.AutoJump = v
+end)
+
+movement:AddToggle("Circle Strafe", false, function(v)
+    Movement.CircleStrafe = v
+end)
+
+movement:AddToggle("Quick Stop", false, function(v)
+    Movement.QuickStop = v
+end)
+
+movement:AddToggle("Edge Jump", false, function(v)
+    Movement.EdgeJump = v
+end)
+
+movement:AddToggle("Jump Bug", false, function(v)
+    Movement.JumpBug = v
+end)
+
+movement:AddToggle("Air Strafe", false, function(v)
+    getgenv().AirStrafeEnabled = v
+end)
+
+movement:AddSlider("Smoothing", 1, 200, 20, function(v)
+    getgenv().AirStrafeStrength = v
+end)
+
+
 
 local snd = Main:AddSection("Others","right")
 
@@ -2381,7 +2388,7 @@ RemoveFlashbang = true
 end)
 
 -- Additional scripts, stacked below the first
-AddScript("Legit no miss cheat", "11/27/26", UDim2.new(0.02000000700354576,0,0.12,0), function()
+AddScript("Legit no miss cheat", "11/27/25", UDim2.new(0.02000000700354576,0,0.12,0), function()
 norecoil = true
 noFireRate = false
 infiniteAmmo = true
@@ -2480,7 +2487,7 @@ RemoveFlashbang = true
     
 end)
 
-AddScript("Hvh legit", "11/27/27", UDim2.new(0.02000000700354576,0,0.23,0), function()
+AddScript("Hvh legit", "11/27/25", UDim2.new(0.02000000700354576,0,0.23,0), function()
     -- Aimbot / Legitbot
 infiniteAmmo = true
 noFireRate = true
@@ -2576,7 +2583,74 @@ RemoveSmoke = true
 -- Flashbang removal
 RemoveFlashbang = true
 end)
+
+AddScript("Hvh config by gerald", "11/31/25", UDim2.new(0.02000000700354576,0,0.34,0), function()
+
+ CAMERA_RANGE = 10 -- default distance
+ Enabled = true
+ AimbotEnabled = false
+ DrawFOV = false
+ Smooth = 1.1
+ Amount = 10
+ DynamicFOV = false
+ Multiplier = 220 -- Base FOV radius
+ HitSelection = "Head"
+ PreferHead = false
+ PreferBody = false
+ BodyIfLethal = true
+ BeforeShotDelay = "None"
+ silentAim = true
+
+t0 = true
+f0 = 14
+spd = 50
+crosshairEnabled = true
+
+
+ norecoil = true
+ spreads = 0
+ noFireRate = true
+ infiniteAmmo = true
+
+_G.ESP_Health_Enabled = true
+_G.ESP_Name_Enabled = true
+_G.ESP_Box_Enabled = false
+
+ GlowEnabled = true
+ CurrentChamColor = Color3.fromRGB(255,255,255)
+
+ ChamsEnabled = true
+ ChamsColor = Color3.fromRGB(255,255,255)
+ ThroughWallsColor = Color3.fromRGB(255,0,255)
+
+ espEnabled = true
+ showBox = false
+ showName = true
+showDistance = false
+
+chamsEnabled = true
+chamsColor = Color3.fromRGB(255, 0, 255)
+
+originalAmbient = Lighting.Ambient
+originalClockTime = Lighting.ClockTime
+originalBrightness = Lighting.Brightness
+fogEnabled = false
+fogStart = 100
+fogEnd = 1000
+nightModeEnabled = true
+
+Movement = {
+    AutoJump = true,
+    CircleStrafe = false,
+    QuickStop = true,
+    EdgeJump = true,
+    JumpBug = false
+}
+
+getgenv().AirStrafeEnabled = true
+
+getgenv().AirStrafeStrength = 50
+
 end)
-
-
+end)
 end
