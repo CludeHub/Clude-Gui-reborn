@@ -1849,7 +1849,7 @@ end
 ma:AddToggle("Night mode", false, function(val)
     nightModeEnabled = val
     if val then
-        setAmbient(Color3.fromRGB(0, 0, 255))
+        setAmbient(Color3.fromRGB(0, 0, 220))
     else
         setAmbient(originalAmbient)
     end
