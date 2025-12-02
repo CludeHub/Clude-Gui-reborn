@@ -512,101 +512,99 @@ enabled = not enabled
 
 end)
 
-local SilentAimConnection  
-local OldNameCall  
+local SilentAimConnection
+local OldNameCall
+local Hooked = false
 
 local FOV = 600
-local silentAim = false  
+local silentAim = false
 
-g:AddToggle("Silent aim", false, function(val)  
-    silentAim = val  
-    local Players = game:GetService("Players")  
-    local RunService = game:GetService("RunService")  
-    local LocalPlayer = Players.LocalPlayer  
-    local Camera = workspace.CurrentCamera  
-    local Mouse = LocalPlayer:GetMouse()  
-    local BodyPart = nil  
+g:AddToggle("Silent aim", false, function(val)
+	silentAim = val
+	local Players = game:GetService("Players")
+	local RunService = game:GetService("RunService")
+	local LocalPlayer = Players.LocalPlayer
+	local Camera = workspace.CurrentCamera
+	local Mouse = LocalPlayer:GetMouse()
+	local BodyPart = nil
 
-    local function WTS(Object)  
-        local ObjectVector = Camera:WorldToScreenPoint(Object.Position)  
-        return Vector2.new(ObjectVector.X, ObjectVector.Y)  
-    end  
+	local function WTS(Object)
+		local ObjectVector = Camera:WorldToScreenPoint(Object.Position)
+		return Vector2.new(ObjectVector.X, ObjectVector.Y)
+	end
 
-    local function PositionToRay(Origin, Target)  
-        return Ray.new(Origin, (Target - Origin).Unit * 600)  
-    end  
+	local function PositionToRay(Origin, Target)
+		return Ray.new(Origin, (Target - Origin).Unit * 600)
+	end
 
-    local function MousePositionToVector2()  
-        return Vector2.new(Mouse.X, Mouse.Y)  
-    end  
+	local function MousePositionToVector2()
+		return Vector2.new(Mouse.X, Mouse.Y)
+	end
 
-    local function IsOnScreen(Object)  
-        local OnScreen, _ = Camera:WorldToScreenPoint(Object.Position)  
-        return OnScreen  
-    end  
+	local function IsOnScreen(Object)
+		local OnScreen, _ = Camera:WorldToScreenPoint(Object.Position)
+		return OnScreen
+	end
 
-    local function IsVisible(Head)  
-        local RayOrigin = Camera.CFrame.Position  
-        local RayDirection = (Head.Position - RayOrigin).Unit * 600  
-        local RaycastParams = RaycastParams.new()  
-        RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist  
-        RaycastParams.FilterDescendantsInstances = {LocalPlayer.Character}  
+	local function IsVisible(Head)
+		local RayOrigin = Camera.CFrame.Position
+		local RayDirection = (Head.Position - RayOrigin).Unit * 600
+		local RaycastParams = RaycastParams.new()
+		RaycastParams.FilterType = Enum.RaycastFilterType.Blacklist
+		RaycastParams.FilterDescendantsInstances = {LocalPlayer.Character}
 
-        local Result = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)  
-        if Result then  
-            local hitPart = Result.Instance
-            local targetPart = workspace.Map.Geometry:GetChildren()[435]
-            if hitPart == targetPart or hitPart.Name == "BreakMetal" or hitPart.Name == "CLIP" then
-                return true -- go through this part
-            else
-                return hitPart:IsDescendantOf(Head.Parent) -- normal visibility
-            end
-        end  
-        return true  
-    end  
+		local Result = workspace:Raycast(RayOrigin, RayDirection, RaycastParams)
+		if Result then
+			local hitPart = Result.Instance
+			-- if we hit wall (CLIP or BreakMetal), stop visibility
+			if hitPart.Name == "CLIP" or hitPart.Name == "BreakMetal" then
+				return false
+			end
+			return hitPart:IsDescendantOf(Head.Parent)
+		end
+		return false
+	end
 
-    local function GetClosestHeadFromCursor()  
-        local ClosestDistance = math.huge  
-        BodyPart = nil  
-        for _, Player in pairs(Players:GetPlayers()) do  
-            if Player ~= LocalPlayer and Player.Team ~= LocalPlayer.Team and Player.Character and Player.Character:FindFirstChild("Humanoid") then  
-                local Humanoid = Player.Character:FindFirstChild("Humanoid")  
-                local Head = Player.Character:FindFirstChild("Head")  
-                if Humanoid and Humanoid.Health > 0 and Head and IsOnScreen(Head) and IsVisible(Head) then  
-                    local Distance = (WTS(Head) - MousePositionToVector2()).Magnitude  
-                    if Distance < ClosestDistance and Distance <= FOV then  
-                        ClosestDistance = Distance  
-                        BodyPart = Head  
-                    end  
-                end  
-            end  
-        end  
-    end  
+	local function GetClosestHeadFromCursor()
+		local ClosestDistance = math.huge
+		BodyPart = nil
+		for _, Player in pairs(Players:GetPlayers()) do
+			if Player ~= LocalPlayer and Player.Team ~= LocalPlayer.Team and Player.Character and Player.Character:FindFirstChild("Humanoid") then
+				local Humanoid = Player.Character:FindFirstChild("Humanoid")
+				local Head = Player.Character:FindFirstChild("Head")
+				if Humanoid and Humanoid.Health > 0 and Head and IsOnScreen(Head) and IsVisible(Head) then
+					local Distance = (WTS(Head) - MousePositionToVector2()).Magnitude
+					if Distance < ClosestDistance and Distance <= FOV then
+						ClosestDistance = Distance
+						BodyPart = Head
+					end
+				end
+			end
+		end
+	end
 
-    if silentAim then  
-        SilentAimConnection = RunService:BindToRenderStep("Dynamic Silent Aim", 120, GetClosestHeadFromCursor)  
+	if silentAim then
+		SilentAimConnection = RunService:BindToRenderStep("DynamicSilentAim", 120, GetClosestHeadFromCursor)
 
-        if not OldNameCall then  
-            OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)  
-                local Method = getnamecallmethod()  
-                local Args = {...}  
-                if Method == "FindPartOnRayWithIgnoreList" and BodyPart then  
-                    local ray = PositionToRay(Camera.CFrame.Position, BodyPart.Position)
-                    -- Only bypass the walls we want
-                    Args[1] = ray
-                    return OldNameCall(Self, unpack(Args))  
-                end  
-                return OldNameCall(Self, ...)  
-            end)  
-        end  
-    else  
-        if SilentAimConnection then  
-            RunService:UnbindFromRenderStep("Dynamic Silent Aim")  
-            SilentAimConnection = nil  
-        end  
-    end  
+		if not Hooked then
+			Hooked = true
+			OldNameCall = hookmetamethod(game, "__namecall", function(Self, ...)
+				local Method = getnamecallmethod()
+				local Args = {...}
+				if Method == "FindPartOnRayWithIgnoreList" and BodyPart then
+					Args[1] = PositionToRay(Camera.CFrame.Position, BodyPart.Position)
+					return OldNameCall(Self, unpack(Args))
+				end
+				return OldNameCall(Self, ...)
+			end)
+		end
+	else
+		if SilentAimConnection then
+			RunService:UnbindFromRenderStep("DynamicSilentAim")
+			SilentAimConnection = nil
+		end
+	end
 end)
-
 
 g:AddToggle('Draw FOV', false, function(val) DrawFOV = val end)
 g:AddDropdown('Before shot delay', {"None", "Combined", "On shot"}, "None", function(val) BeforeShotDelay = val end)
@@ -909,15 +907,6 @@ g:AddSlider("Weapon Bullets", 1,50, 1, function(val)
     end
 end)
 
-g:AddSlider("Damage", 1, 300, 140, function(val)
-    local weaponsFolder = game:GetService("ReplicatedStorage"):WaitForChild("Weapons")
-    for _, weapon in ipairs(weaponsFolder:GetChildren()) do
-        if weapon:FindFirstChild("DMG") then
-            weapon.DMG.Value = val
-        end
-    end
-end)
-
 end
 do
 local Fl = Legitbot:AddSection("Flick", "left")
@@ -1057,185 +1046,130 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- STORAGE
-local Boxes = {}
-local HealthBars = {}
-local Names = {}
+local Boxes, HealthBars, Names = {}, {}, {}
 
--- CREATE ESP FOR PLAYER
+-- CONFIG DEFAULTS
+_G.ESP_TeamCheck = true
+_G.ESP_Box_Enabled = false
+_G.ESP_Health_Enabled = false
+_G.ESP_Name_Enabled = false
+_G.ESP_MaxDistance = 500 -- how far ESP shows
+
 local function CreateESP(player)
-if player == LocalPlayer then return end
-if Boxes[player] then return end
+    if player == LocalPlayer then return end
+    if Boxes[player] then return end
 
--- BOX  
-local box = Drawing.new("Square")  
-box.Visible = false  
-box.Color = Color3.new(1,1,1)  
-box.Thickness = 1  
-box.Filled = false  
-Boxes[player] = box  
+    Boxes[player] = Drawing.new("Square")
+    Boxes[player].Thickness = 1
+    Boxes[player].Filled = false
+    Boxes[player].Visible = false
+    Boxes[player].Color = Color3.fromRGB(255,255,255)
 
--- HEALTH BAR  
-local hp = Drawing.new("Square")  
-hp.Visible = false  
-hp.Filled = true  
-hp.Thickness = 1  
-HealthBars[player] = hp  
+    HealthBars[player] = Drawing.new("Square")
+    HealthBars[player].Filled = true
+    HealthBars[player].Visible = false
 
--- NAME TEXT  
-local nameText = Drawing.new("Text")  
-nameText.Visible = false  
-nameText.Color = Color3.new(1,1,1)  
-nameText.Size = 8  
-nameText.Center = true  
-nameText.Outline = true  
-nameText.OutlineColor = Color3.new(0,0,0)  
-Names[player] = nameText
-
+    Names[player] = Drawing.new("Text")
+    Names[player].Size = 8
+    Names[player].Center = true
+    Names[player].Outline = true
+    Names[player].OutlineColor = Color3.new(0,0,0)
+    Names[player].Visible = false
 end
 
--- REMOVE ESP ON LEAVE
-Players.PlayerRemoving:Connect(function(player)
-if Boxes[player] then Boxes[player]:Remove() Boxes[player] = nil end
-if HealthBars[player] then HealthBars[player]:Remove() HealthBars[player] = nil end
-if Names[player] then Names[player]:Remove() Names[player] = nil end
-end)
-
--- ADD EXISTING PLAYERS
-for _, p in ipairs(Players:GetPlayers()) do
-CreateESP(p)
+local function RemoveESP(player)
+    if Boxes[player] then Boxes[player]:Remove() Boxes[player] = nil end
+    if HealthBars[player] then HealthBars[player]:Remove() HealthBars[player] = nil end
+    if Names[player] then Names[player]:Remove() Names[player] = nil end
 end
 
--- ADD NEW PLAYERS
 Players.PlayerAdded:Connect(CreateESP)
+Players.PlayerRemoving:Connect(RemoveESP)
+for _, p in ipairs(Players:GetPlayers()) do CreateESP(p) end
 
--- UPDATE LOOP
-RunService.RenderStepped:Connect(function()
-for player, box in pairs(Boxes) do
-local char = player.Character
-local root = char and char:FindFirstChild("HumanoidRootPart")
-local humanoid = char and char:FindFirstChild("Humanoid")
-local hpBar = HealthBars[player]
-local nameDraw = Names[player]
+local tickLimiter = 0
+RunService.RenderStepped:Connect(function(dt)
+    tickLimiter += dt
+    if tickLimiter < 0.05 then return end -- updates 20x per second (smooth & lag-free)
+    tickLimiter = 0
 
--- VALID PLAYER CHECK  
-    if root and humanoid and humanoid.Health > 0 then  
-        -- TEAM CHECK  
-        if _G.ESP_TeamCheck then  
-            if player.Team ~= nil and LocalPlayer.Team ~= nil then  
-                if player.Team == LocalPlayer.Team then  
-                    -- same team = hide ESP  
-                    if box then box.Visible = false end  
-                    if hpBar then hpBar.Visible = false end  
-                    if nameDraw then nameDraw.Visible = false end  
-                    continue  
-                end  
-            end  
-        end  
+    for player, box in pairs(Boxes) do
+        local char = player.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+        local hpBar = HealthBars[player]
+        local nameDraw = Names[player]
 
-        -- ON SCREEN  
-        local rootViewport, onScreen = Camera:WorldToViewportPoint(root.Position)  
-        if onScreen then  
-            -- TOP / BOTTOM OF PLAYER  
-            local topViewport = Camera:WorldToViewportPoint(root.Position + Vector3.new(0, humanoid.HipHeight * 2 + 3, 0))  
-            local bottomViewport = Camera:WorldToViewportPoint(root.Position - Vector3.new(0, humanoid.HipHeight * 2 + 3, 0))  
+        if not (root and humanoid and humanoid.Health > 0) then
+            box.Visible, hpBar.Visible, nameDraw.Visible = false,false,false
+            continue
+        end
 
-            -- HEIGHT / WIDTH  
-            local height = math.abs(bottomViewport.Y - topViewport.Y)  
-            if height < 6 then height = 6 end  
-            local width = height / 2.3  
+        if _G.ESP_TeamCheck and player.Team == LocalPlayer.Team then
+            box.Visible, hpBar.Visible, nameDraw.Visible = false,false,false
+            continue
+        end
 
-            --------------------  
-            --    BOX ESP     --  
-            --------------------  
-            if _G.ESP_Box_Enabled then  
-                box.Size = Vector2.new(width, height)  
-                box.Position = Vector2.new(rootViewport.X - width/2, rootViewport.Y - height/2)  
-                box.Visible = true  
-            else  
-                box.Visible = false  
-            end  
+        local distance = (root.Position - Camera.CFrame.Position).Magnitude
+        if distance > _G.ESP_MaxDistance then
+            box.Visible, hpBar.Visible, nameDraw.Visible = false,false,false
+            continue
+        end
 
-            ------------------------  
-            --   HEALTH BAR ESP    --  
-            ------------------------  
-            if _G.ESP_Health_Enabled then  
-                local hpPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)  
+        local rootPos, onScreen = Camera:WorldToViewportPoint(root.Position)
+        if not onScreen then
+            box.Visible, hpBar.Visible, nameDraw.Visible = false,false,false
+            continue
+        end
 
-                local r = 1 - hpPercent  
-                local g = hpPercent  
-                hpBar.Color = Color3.new(r, g, 0)  
+        local top = Camera:WorldToViewportPoint(root.Position + Vector3.new(0, 3, 0))
+        local bottom = Camera:WorldToViewportPoint(root.Position - Vector3.new(0, 3, 0))
+        local height = math.abs(bottom.Y - top.Y)
+        local width = height / 2.3
 
-                local barHeight = height * hpPercent  
-                if barHeight < 2 then barHeight = 2 end  
+        if _G.ESP_Box_Enabled then
+            box.Size = Vector2.new(width, height)
+            box.Position = Vector2.new(rootPos.X - width/2, rootPos.Y - height/2)
+            box.Visible = true
+        else
+            box.Visible = false
+        end
 
-                local barX = (rootViewport.X - width/2) - 3  -- left of box  
-                local barY = rootViewport.Y - height/2 + (height - barHeight)  
+        if _G.ESP_Health_Enabled then
+            local hpPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+            hpBar.Color = Color3.fromRGB(255 - (hpPercent * 255), hpPercent * 255, 0)
+            local barHeight = height * hpPercent
+            local barX = (rootPos.X - width/2) - 3
+            local barY = rootPos.Y - height/2 + (height - barHeight)
+            hpBar.Size = Vector2.new(2, barHeight)
+            hpBar.Position = Vector2.new(barX, barY)
+            hpBar.Visible = true
+        else
+            hpBar.Visible = false
+        end
 
-                hpBar.Size = Vector2.new(2, barHeight)      -- thin health bar  
-                hpBar.Position = Vector2.new(barX, barY)  
-                hpBar.Visible = true  
-            else  
-                hpBar.Visible = false  
-            end  
-
-            --------------------  
-            --   NAME ESP     --  
-            --------------------  
-            if _G.ESP_Name_Enabled then  
-                nameDraw.Text = player.Name  
-                nameDraw.Position = Vector2.new(rootViewport.X, (rootViewport.Y - height/2) - 15)  
-                nameDraw.Visible = true  
-            else  
-                nameDraw.Visible = false  
-            end  
-
-        else  
-            box.Visible = false  
-            hpBar.Visible = false  
-            nameDraw.Visible = false  
-        end  
-
-    else  
-        -- DEAD OR NO CHARACTER  
-        box.Visible = false  
-        if hpBar then hpBar.Visible = false end  
-        if nameDraw then nameDraw.Visible = false end  
-    end  
-end
-
+        if _G.ESP_Name_Enabled then
+            nameDraw.Text = player.Name
+            nameDraw.Position = Vector2.new(rootPos.X, rootPos.Y - height/2 - 12)
+            nameDraw.Visible = true
+        else
+            nameDraw.Visible = false
+        end
+    end
 end)
--- Box ESP
+
+-- 🟢 UI TOGGLES (same as your old code)
 ESP:AddToggle("Box", false, function(val)
     _G.ESP_Box_Enabled = val
 end)
 
--- Health Bar ESP
 ESP:AddToggle("Health Bar", false, function(val)
     _G.ESP_Health_Enabled = val
 end)
 
--- Name ESP
 ESP:AddToggle("Name", false, function(val)
     _G.ESP_Name_Enabled = val
 end)
-_G.ESP_TeamCheck = true
-
--- // Safe service locator
-local function SafeGetService(name)
-    for _, obj in pairs(getnilinstances()) do
-        if obj.ClassName == "Players" then
-            return obj
-        end
-    end
-    for _, obj in pairs(game:GetChildren()) do
-        if obj.ClassName == "Players" then
-            return obj
-        end
-    end
-    return game:FindService(name) or game:GetService(name)
-end
-
 
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
@@ -1551,21 +1485,23 @@ local ChamsColor = Color3.fromRGB(255,255,255)
 local ThroughWallsColor = Color3.fromRGB(255,255,255)
 local TeamCheckEnabled = true
 
--- GUI
+-- Cache
+local Highlights = {}
+
+-- GUI setup (you can keep your chm:AddToggle / AddDropdown as-is)
 chm:AddToggle("Enable", false, function(val)
     ChamsEnabled = val
     if not val then
-        for _, player in pairs(Services.Players:GetPlayers()) do
-            if player.Character and player.Character:FindFirstChild("ChamsHighlight") then
-                player.Character.ChamsHighlight:Destroy()
-            end
+        for _, h in pairs(Highlights) do
+            if h and h.Parent then h:Destroy() end
         end
+        Highlights = {}
     end
 end)
 
 chm:AddDropdown("Visible", { "Pink","Blue","Toothpaste","Green","Yellow","Red","Orange","White" }, "White", function(val)
     local colors = {
-        Pink = Color3.fromRGB(255,20, 255),
+        Pink = Color3.fromRGB(255,20,255),
         Blue = Color3.fromRGB(0,0,255),
         Toothpaste = Color3.fromRGB(0,255,255),
         Green = Color3.fromRGB(0,255,0),
@@ -1591,7 +1527,7 @@ chm:AddDropdown("Invisible", { "Pink","Blue","Toothpaste","Green","Yellow","Red"
     ThroughWallsColor = colors[val] or Color3.fromRGB(255,255,255)
 end)
 
--- Check if visible
+-- Visibility check (used less often)
 local function isVisible(part)
     local origin = Camera.CFrame.Position
     local ray = Ray.new(origin, (part.Position - origin).Unit * 9999)
@@ -1599,36 +1535,39 @@ local function isVisible(part)
     return hit and hit:IsDescendantOf(part.Parent)
 end
 
--- Apply chams (one highlight per character)
-local function applyChams(player)
-    if player == LocalPlayer then return end
-    if TeamCheckEnabled and player.Team == LocalPlayer.Team then return end
-    local char = player.Character
-    if not char then return end
-
-    local highlight = char:FindFirstChild("ChamsHighlight")
-    if not highlight then
-        highlight = Instance.new("Highlight")
-        highlight.Name = "ChamsHighlight"
-        highlight.FillTransparency = 0
-        highlight.OutlineTransparency = 1
-        highlight.Parent = char
-    end
-
-    local head = char:FindFirstChild("Head") or char:FindFirstChildWhichIsA("BasePart")
-    if head then
-        if isVisible(head) then
-            highlight.FillColor = ChamsColor
-        else
-            highlight.FillColor = ThroughWallsColor
-        end
-    end
+-- Create highlight once
+local function createHighlight(character)
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ChamsHighlight"
+    highlight.FillTransparency = 0
+    highlight.OutlineTransparency = 1
+    highlight.Parent = character
+    return highlight
 end
 
-RunService.RenderStepped:Connect(function()
-    if not ChamsEnabled then return end
-    for _, player in pairs(Services.Players:GetPlayers()) do
-        applyChams(player)
+-- Refresh every 0.2s (5 times per second, instead of 60)
+task.spawn(function()
+    while true do
+        task.wait(0.2)
+        if not ChamsEnabled then continue end
+
+        for _, player in pairs(Services.Players:GetPlayers()) do
+            if player == LocalPlayer then continue end
+            if TeamCheckEnabled and player.Team == LocalPlayer.Team then continue end
+
+            local char = player.Character
+            if char then
+                local head = char:FindFirstChild("Head") or char:FindFirstChildWhichIsA("BasePart")
+                if head then
+                    if not Highlights[player] or not Highlights[player].Parent then
+                        Highlights[player] = createHighlight(char)
+                    end
+                    local highlight = Highlights[player]
+                    local visible = isVisible(head)
+                    highlight.FillColor = visible and ChamsColor or ThroughWallsColor
+                end
+            end
+        end
     end
 end)
 
